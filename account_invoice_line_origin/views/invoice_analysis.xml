@@ -1,0 +1,14 @@
+<odoo>
+
+    <record id="view_account_invoice_line_report_tree" model="ir.ui.view">
+        <field name="model">account.invoice.line.report</field>
+        <field name="name">account.invoice.line.report.tree</field>
+        <field name="inherit_id" ref="l10n_ar_account.view_account_invoice_line_report_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_id']" position="after">
+                <field name="origin"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

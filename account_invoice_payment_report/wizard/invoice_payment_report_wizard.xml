@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="invoice_payment_report_wizard_view" model="ir.ui.view">
+        <field name="name">Invoice Payment Report Wizard View</field>
+        <field name="model">account.invoice.payment.report.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="date_from" required="1" />
+                    <field name="date_to" required="1" />
+                </group>
+                <footer>
+                    <button name="generate_xls_report" string="Print XLSX" type="object" class="oe_highlight" />
+                    <button special="cancel" string="Cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="invoice_payment_report_wizard_action" name="Invoice Payment Report Wizard" res_model="account.invoice.payment.report.wizard" view_type="form" view_mode="form" target="new" />
+
+    <menuitem id="invoice_payment_report_wizard_menu" name="Invoice Payment Report" parent="account.account_reports_management_menu" action="invoice_payment_report_wizard_action" />
+
+</odoo>

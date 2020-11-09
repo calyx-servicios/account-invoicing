@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <report id="invoice_payment_report_action" model="account.invoice.payment.report.wizard" string="Invoice Payment Report" report_type="xlsx" name="account_invoice_payment_report.payment_report_xlsx" file="payment_report" attachment_use="False" />
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="True">
+    <!-- Resource: product.uom.categ -->
+    <record id="cat_interest" model="product.category">
+        <field name="parent_id" ref="product.product_category_all"/>
+        <field name="name">Interest</field>
+    </record>
+
+    <record id="product_product_invoice_interest" model="product.product" >
+        <field name="name">Interest</field>
+        <field name="list_price">0.0</field>
+        <field name="standard_price">1.0</field>
+        <field name="type">service</field>
+        <field name="default_code">INT</field>
+        <field name="categ_id" ref="account_invoice_interest_calc.cat_interest"/>
+        <field name="can_be_expensed" eval="True"/>
+    </record>
+
+</odoo>

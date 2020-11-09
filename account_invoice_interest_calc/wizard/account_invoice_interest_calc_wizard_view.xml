@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <record id="account_invoice_interest_calc_wizard" model="ir.ui.view">
+        <field name="name">Account Invoice Calculator Wizard</field>
+        <field name="model">account.invoice.interest.calc.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group name="vars">
+                    <field name="interest" class="oe_inline" placeholder="Write here the interest you want to apply"/>
+                    <field name="period" class="oe_inline"/>
+                    <field name="date" class="oe_inline" on_change="calc_amount(date)"/>
+                    <field name="journal_id" groups="account.group_account_user" options="{'no_create': True}"/>
+                    <field name="multi" invisible="True"/>
+                                    
+                </group>
+                <group name="filters" attrs="{'invisible': [('multi', '=', True)]}">
+                    <field name="partner_id" options="{'no_create': True}"/>
+                </group>
+                <!-- <notebook attrs="{'invisible': [('multi', '=', True)]}"> -->
+                <notebook>
+                    <page string="Invoices" invisible="1">
+                        <field name="invoice_ids" domain="[('partner_id', '=', partner_id), ('type','=','out_invoice'), ('state','=','open'), ('date_due', '&lt;=', date)]"/>
+                    </page>
+                    <page string="Invoices">
+                        <field name="account_interest_calc_details_ids" context="{'default_date': date}">
+                            <tree editable="bottom">
+                                <field name="account_invoice_interest_calc_id" invisible="1"/>
+                                <field name="invoice_ids"  options="{'no_create': True}" domain="[('account_due_calc', '=', True), ('type','=','out_invoice'), ('state','=','open')]"/>
+                                <field name="partner_id" readonly="1"/>
+                                <field name="date_invoice" readonly="1"/>
+                                <field name="expired_date" invisible="1"/>
+                                <field name="invoice_dues" widget='many2many_tags' options="{'no_create': True}" domain="[('date_maturity', '&lt;=', expired_date), ('invoice_id', '=', invoice_ids),('amount_residual','!=',0)]" context="{'invoice_account_interest':True}" />
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+                <footer>
+                        <button name="calculate" string="Calculate"
+                            type="object" default_focus="1" class="oe_highlight" attrs="{'invisible': [('multi', '=', True)]}"/>
+                         <button name="calculate_multi" string="Calculate"
+                            type="object" default_focus="1" class="oe_highlight" attrs="{'invisible': [('multi', '=', False)]}"/>
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="action_account_invoice_interest_calc_wizard" 
+                name="Interest Calculate" 
+                src_model="account.invoice" 
+                res_model="account.invoice.interest.calc.wizard"
+                view_type="form"
+                view_mode="form"
+                view_id="account_invoice_interest_calc_wizard"
+                target="new"/>
+    <menuitem
+        id="menu_account_invoice_interest"
+        name="Interest"
+        parent="account.menu_finance_receivables"
+        groups="account.group_account_manager,account.group_account_user"
+        />
+
+    <menuitem
+        id="menu_account_invoice_interest_calc_wizard"
+        name="Interest Calculate"
+        action="action_account_invoice_interest_calc_wizard"
+        parent="menu_account_invoice_interest"
+        groups="account.group_account_manager,account.group_account_user"
+        />
+
+    <act_window id="action_precios_update"
+            multi="True"
+            key2="client_action_multi" 
+            name="Interest Calculate"
+            res_model="account.invoice.interest.calc.wizard" 
+            src_model="account.invoice"
+            view_mode="form" target="new" 
+            view_type="form" 
+            context="{'default_invoice_ids': active_ids,
+                        'default_multi': True}"
+            />
+
+</odoo>
