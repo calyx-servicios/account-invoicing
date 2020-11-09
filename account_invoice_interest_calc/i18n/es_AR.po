@@ -1,0 +1,176 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* account_invoice_interest_calc
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 11.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-11-15 18:06+0000\n"
+"PO-Revision-Date: 2019-11-15 15:14-0300\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"X-Generator: Poedit 2.2.4\n"
+
+#. module: account_invoice_interest_calc
+#: model:ir.model,name:account_invoice_interest_calc.model_account_invoice_interest_calc_wizard
+msgid "Account Invoice Calculator Wizard"
+msgstr "Calculador de Intereses"
+
+#. module: account_invoice_interest_calc
+#: selection:account.invoice.interest.calc.wizard,period:0
+msgid "Annual"
+msgstr "Anual"
+
+#. module: account_invoice_interest_calc
+#: model:ir.ui.view,arch_db:account_invoice_interest_calc.account_invoice_interest_calc_wizard
+msgid "Calculate"
+msgstr "Calcular"
+
+#. module: account_invoice_interest_calc
+#: model:ir.ui.view,arch_db:account_invoice_interest_calc.account_invoice_interest_calc_wizard
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: account_invoice_interest_calc
+#: model:ir.model.fields,field_description:account_invoice_interest_calc.field_account_invoice_interest_calc_wizard_create_uid
+msgid "Created by"
+msgstr "Creado por"
+
+#. module: account_invoice_interest_calc
+#: model:ir.model.fields,field_description:account_invoice_interest_calc.field_account_invoice_interest_calc_wizard_create_date
+msgid "Created on"
+msgstr "Creado en"
+
+#. module: account_invoice_interest_calc
+#: model:ir.model.fields,field_description:account_invoice_interest_calc.field_account_invoice_interest_calc_wizard_partner_id
+msgid "Customer"
+msgstr "Cliente"
+
+#. module: account_invoice_interest_calc
+#: selection:account.invoice.interest.calc.wizard,period:0
+msgid "Daily"
+msgstr "Diaria"
+
+#. module: account_invoice_interest_calc
+#: model:ir.model.fields,field_description:account_invoice_interest_calc.field_account_invoice_interest_calc_wizard_date
+msgid "Date"
+msgstr "Fecha"
+
+#. module: account_invoice_interest_calc
+#: code:addons/account_invoice_interest_calc/wizard/account_invoice_interest_calc_wizard.py:93
+#, python-format
+msgid "Debit Note"
+msgstr "Debit Note"
+
+#. module: account_invoice_interest_calc
+#: model:ir.model.fields,field_description:account_invoice_interest_calc.field_account_invoice_interest_calc_wizard_display_name
+msgid "Display Name"
+msgstr "Mostrar Nombre"
+
+#. module: account_invoice_interest_calc
+#: model:ir.model.fields,field_description:account_invoice_interest_calc.field_account_invoice_interest_calc_wizard_id
+msgid "ID"
+msgstr "ID"
+
+#. module: account_invoice_interest_calc
+#: model:ir.model.fields,field_description:account_invoice_interest_calc.field_account_invoice_interest_calc_wizard_interest
+#: model:ir.ui.menu,name:account_invoice_interest_calc.menu_account_invoice_interest
+#: model:product.category,name:account_invoice_interest_calc.cat_interest
+#: model:product.product,name:account_invoice_interest_calc.product_product_invoice_interest
+#: model:product.template,name:account_invoice_interest_calc.product_product_invoice_interest_product_template
+msgid "Interest"
+msgstr "Interes"
+
+#. module: account_invoice_interest_calc
+#: model:ir.actions.act_window,name:account_invoice_interest_calc.action_account_invoice_interest_calc_wizard
+#: model:ir.actions.act_window,name:account_invoice_interest_calc.action_precios_update
+#: model:ir.ui.menu,name:account_invoice_interest_calc.menu_account_invoice_interest_calc_wizard
+msgid "Interest Calculate"
+msgstr "Calcular Intereses"
+
+#. module: account_invoice_interest_calc
+#: model:ir.model,name:account_invoice_interest_calc.model_account_invoice
+msgid "Invoice"
+msgstr "Factura"
+
+#. module: account_invoice_interest_calc
+#: model:ir.model.fields,field_description:account_invoice_interest_calc.field_account_invoice_interest_calc_wizard_invoice_ids
+#: model:ir.ui.view,arch_db:account_invoice_interest_calc.account_invoice_interest_calc_wizard
+msgid "Invoices"
+msgstr "Facturas"
+
+#. module: account_invoice_interest_calc
+#: model:ir.model.fields,field_description:account_invoice_interest_calc.field_account_invoice_interest_calc_wizard_journal_id
+msgid "Journal"
+msgstr "Diario"
+
+#. module: account_invoice_interest_calc
+#: model:ir.model.fields,field_description:account_invoice_interest_calc.field_account_invoice_interest_calc_wizard___last_update
+msgid "Last Modified on"
+msgstr "Última modificación en"
+
+#. module: account_invoice_interest_calc
+#: model:ir.model.fields,field_description:account_invoice_interest_calc.field_account_invoice_interest_calc_wizard_write_uid
+msgid "Last Updated by"
+msgstr "Última actualización realizada por"
+
+#. module: account_invoice_interest_calc
+#: model:ir.model.fields,field_description:account_invoice_interest_calc.field_account_invoice_interest_calc_wizard_write_date
+msgid "Last Updated on"
+msgstr "Última actualización el"
+
+#. module: account_invoice_interest_calc
+#: selection:account.invoice.interest.calc.wizard,period:0
+msgid "Monthly"
+msgstr "Mensual"
+
+#. module: account_invoice_interest_calc
+#: model:ir.model.fields,field_description:account_invoice_interest_calc.field_account_invoice_interest_calc_wizard_multi
+msgid "Multi"
+msgstr "Multi"
+
+#. module: account_invoice_interest_calc
+#: code:addons/account_invoice_interest_calc/wizard/account_invoice_interest_calc_wizard.py:130
+#, python-format
+msgid "Only interest in open invoices can be calculated. At least one of the selected invoices is not in an open state or supplier invoice. Change the selection of invoices and try again."
+msgstr "Solo se puede calcular el interés en las facturas abiertas. Al menos una de las facturas seleccionadas no está en estado abierto o es factura de proveedor. Cambie la selección de facturas e intente nuevamente."
+
+#. module: account_invoice_interest_calc
+#: code:addons/account_invoice_interest_calc/wizard/account_invoice_interest_calc_wizard.py:74
+#, python-format
+msgid "Only interest in open invoices can be calculated. At least one of the selected invoices is not in an open state. Change the selection of invoices and try again."
+msgstr "Solo se puede calcular el interés en las facturas abiertas. Al menos una de las facturas seleccionadas no está en estado abierto. Cambie la selección de facturas e intente nuevamente."
+
+#. module: account_invoice_interest_calc
+#: model:ir.model.fields,field_description:account_invoice_interest_calc.field_account_invoice_interest_calc_wizard_period
+msgid "Period"
+msgstr "Periodo"
+
+#. module: account_invoice_interest_calc
+#: code:addons/account_invoice_interest_calc/wizard/account_invoice_interest_calc_wizard.py:70
+#, python-format
+msgid "Select one or more invoices to continue."
+msgstr "Seleccione una o más facturas para continuar."
+
+#. module: account_invoice_interest_calc
+#: code:addons/account_invoice_interest_calc/wizard/account_invoice_interest_calc_wizard.py:138
+#, python-format
+msgid "The %s invoice is not expired."
+msgstr "La factura %s no esta vencida."
+
+#. module: account_invoice_interest_calc
+#: model:ir.ui.view,arch_db:account_invoice_interest_calc.account_invoice_interest_calc_wizard
+msgid "Write here the interest you want to apply"
+msgstr "Escriba aquí el interés que desea aplicar."
+
+#. module: account_invoice_interest_calc
+#: code:addons/account_invoice_interest_calc/wizard/account_invoice_interest_calc_wizard.py:68
+#: code:addons/account_invoice_interest_calc/wizard/account_invoice_interest_calc_wizard.py:124
+#, python-format
+msgid "You need define Afip responsability type for this partner."
+msgstr "Necesita definir un tipo de responsabilidad AFIP para este contacto."

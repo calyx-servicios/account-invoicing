@@ -1,0 +1,124 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* account_invoice_payment_report
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 11.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-03-31 00:28+0000\n"
+"PO-Revision-Date: 2020-03-31 00:28+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: account_invoice_payment_report
+#: model:ir.ui.view,arch_db:account_invoice_payment_report.invoice_payment_report_wizard_view
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: account_invoice_payment_report
+#: model:ir.model.fields,field_description:account_invoice_payment_report.field_account_invoice_payment_report_wizard_create_uid
+msgid "Created by"
+msgstr "Creado por"
+
+#. module: account_invoice_payment_report
+#: model:ir.model.fields,field_description:account_invoice_payment_report.field_account_invoice_payment_report_wizard_create_date
+msgid "Created on"
+msgstr "Creado en"
+
+#. module: account_invoice_payment_report
+#: code:addons/account_invoice_payment_report/reports/payment_report_xlsx.py:84
+#: code:addons/addons-calyx/odoo-calyx/account_invoice_payment_report/reports/payment_report_xlsx.py:84
+#, python-format
+msgid "Date From"
+msgstr "Fecha desde"
+
+#. module: account_invoice_payment_report
+#: code:addons/account_invoice_payment_report/reports/payment_report_xlsx.py:89
+#: code:addons/addons-calyx/odoo-calyx/account_invoice_payment_report/reports/payment_report_xlsx.py:89
+#, python-format
+msgid "Date To"
+msgstr "Fecha hasta"
+
+#. module: account_invoice_payment_report
+#: model:ir.model.fields,field_description:account_invoice_payment_report.field_account_invoice_payment_report_wizard_display_name
+#: model:ir.model.fields,field_description:account_invoice_payment_report.field_report_account_invoice_payment_report_payment_report_xlsx_display_name
+msgid "Display Name"
+msgstr "Mostrar Nombre"
+
+#. module: account_invoice_payment_report
+#: model:ir.model.fields,field_description:account_invoice_payment_report.field_account_invoice_payment_report_wizard_date_from
+msgid "From"
+msgstr "De"
+
+#. module: account_invoice_payment_report
+#: model:ir.model.fields,field_description:account_invoice_payment_report.field_account_invoice_payment_report_wizard_id
+#: model:ir.model.fields,field_description:account_invoice_payment_report.field_report_account_invoice_payment_report_payment_report_xlsx_id
+msgid "ID"
+msgstr "ID"
+
+#. module: account_invoice_payment_report
+#: model:ir.actions.report,name:account_invoice_payment_report.invoice_payment_report_action
+#: model:ir.ui.menu,name:account_invoice_payment_report.invoice_payment_report_wizard_menu
+msgid "Invoice Payment Report"
+msgstr "Reporte Pagos contra Facturas"
+
+#. module: account_invoice_payment_report
+#: model:ir.actions.act_window,name:account_invoice_payment_report.invoice_payment_report_wizard_action
+msgid "Invoice Payment Report Wizard"
+msgstr "Wizard Reporte Pagos contra Facturas"
+
+#. module: account_invoice_payment_report
+#: code:addons/account_invoice_payment_report/reports/payment_report_xlsx.py:79
+#: code:addons/addons-calyx/odoo-calyx/account_invoice_payment_report/reports/payment_report_xlsx.py:79
+#, python-format
+msgid "Invoice Payments Report"
+msgstr "Reporte Pagos contra Facturas"
+
+#. module: account_invoice_payment_report
+#: model:ir.model.fields,field_description:account_invoice_payment_report.field_account_invoice_payment_report_wizard___last_update
+#: model:ir.model.fields,field_description:account_invoice_payment_report.field_report_account_invoice_payment_report_payment_report_xlsx___last_update
+msgid "Last Modified on"
+msgstr "Última modificación en"
+
+#. module: account_invoice_payment_report
+#: model:ir.model.fields,field_description:account_invoice_payment_report.field_account_invoice_payment_report_wizard_write_uid
+msgid "Last Updated by"
+msgstr "Última actualización realizada por"
+
+#. module: account_invoice_payment_report
+#: model:ir.model.fields,field_description:account_invoice_payment_report.field_account_invoice_payment_report_wizard_write_date
+msgid "Last Updated on"
+msgstr "Última actualización el"
+
+#. module: account_invoice_payment_report
+#: code:addons/account_invoice_payment_report/reports/payment_report_xlsx.py:62
+#: code:addons/addons-calyx/odoo-calyx/account_invoice_payment_report/reports/payment_report_xlsx.py:62
+#, python-format
+msgid "Payments"
+msgstr "Pagos"
+
+#. module: account_invoice_payment_report
+#: model:ir.ui.view,arch_db:account_invoice_payment_report.invoice_payment_report_wizard_view
+msgid "Print XLSX"
+msgstr "Imprimir XLSX"
+
+#. module: account_invoice_payment_report
+#: model:ir.model.fields,field_description:account_invoice_payment_report.field_account_invoice_payment_report_wizard_date_to
+msgid "To"
+msgstr "Para"
+
+#. module: account_invoice_payment_report
+#: model:ir.model,name:account_invoice_payment_report.model_account_invoice_payment_report_wizard
+msgid "account.invoice.payment.report.wizard"
+msgstr "account.invoice.payment.report.wizard"
+
+#. module: account_invoice_payment_report
+#: model:ir.model,name:account_invoice_payment_report.model_report_account_invoice_payment_report_payment_report_xlsx
+msgid "report.account_invoice_payment_report.payment_report_xlsx"
+msgstr "report.account_invoice_payment_report.payment_report_xlsx"
+
