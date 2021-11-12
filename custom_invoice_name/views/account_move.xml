@@ -9,7 +9,7 @@
             </form>
             <xpath expr="//field[@name='name']" position="attributes" >
                 <attribute name = 'readonly'></attribute>
-                <attribute name = 'attrs'>{'readonly':[('company_country_id','in',['AR','CL'])('state','!=','draft')]}</attribute>
+                <attribute name = 'attrs'>{'readonly':[('company_country_id','in',['AR','CL']),('state','!=','draft')]}</attribute>
             </xpath>
         </field>
     </record>
