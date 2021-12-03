@@ -46,6 +46,8 @@ Configure
 Usage
 =====
 
+1. Invoice name can be written if company country is not Chile or Argentina
+
 Known issues / Roadmap
 ======================
 
