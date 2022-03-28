@@ -36,7 +36,7 @@ class AccountMove(models.Model):
             filtered_bills = self.filtered(
                 lambda x: x.is_purchase_document() and x.commercial_partner_id
             )
-        else:)
+        else:
             filtered_bills = self.filtered(
                 lambda x: x.is_purchase_document()
                 and x.l10n_latam_use_documents
