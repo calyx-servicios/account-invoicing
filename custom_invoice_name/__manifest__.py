@@ -26,7 +26,7 @@
     },
 
     # any module necessary for this one to work correctly
-    'depends': ['base','account'],
+    'depends': ['base','account','l10n_latam_invoice_document'],
 
     # always loaded
     'data': [
