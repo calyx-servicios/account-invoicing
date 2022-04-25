@@ -20,7 +20,7 @@ class AccountMove(models.Model):
         THIS CONSTRAINT IS OVERRIDEN from l10n_latam_invoice_document to avoid 'use_documents' validation on localizations
         other than AR and CL
         """
-        if self.company_country_id not in ["AR", "CL"]:
+        if self.env.company.country_id.code not in ["AR", "CL"]:
             vendor = self.filtered(lambda x: x.is_purchase_document())
         else:
             vendor = self.filtered(
