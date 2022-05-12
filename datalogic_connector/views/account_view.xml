@@ -16,6 +16,8 @@
                 <page id="dgi_info" string="DGI" name="DGI">
                 <group>
                     <group>
+                        <field name="origin_ref"/>
+                        <field name="origin_date"/>
                         <field name="error_dgi" attrs="{'invisible':[('error_dgi','=','1')]}"/>
                         <field name="tpo_cfe" class="oe_inline"/>
                         <field name="serie_cfe" />

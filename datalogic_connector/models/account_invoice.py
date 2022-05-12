@@ -24,6 +24,13 @@ class AccountInvice(models.Model):
     estado = fields.Char()
     txt_send = fields.Text()
     txt_rquest = fields.Text()
+    display_name = fields.Char(
+        compute='_compute_display_name',
+        string='Document Reference',
+        store=True
+    )
+    origin_ref = fields.Char()
+    origin_date = fields.Date()
 
     def scape_value(self,string):
         original_value = ["º","À","Á","Â","Ã","Ä","Å","Æ","Ç","È","É","Ê","Ë","Ì","Í","Î","Ï",
@@ -409,6 +416,7 @@ class AccountInvice(models.Model):
         text_node = doc.createTextNode(str(self.company_id.company_registry))
         BanNomComEmi.appendChild(text_node)
         Bandeja.appendChild(BanNomComEmi)
+        
 # <!-- Codigo Sucursal Principal Emisor [String(6)] nos lo dan ellos en algun momento-->
         # BanSucCodPriEmi = doc.createElement("BanSucCodPriEmi")
         # text_node = doc.createTextNode("")
@@ -677,59 +685,78 @@ class AccountInvice(models.Model):
         Bandeja.appendChild(BanLin)
 
 #  <!-- Informacion de referencia-->
-        if cfe_type in ["102","112","103","113"]:
+        if cfe_type in ["122","112","123","113"]:
                 BanInfRef = doc.createElement("BanInfRef")
                 Bandeja.appendChild(BanInfRef)
 
                 BanInfRefItem = doc.createElement("BanInfRefItem")
                 BanInfRef.appendChild(BanInfRefItem)
-        #    <!-- N° de línea o N° Secuencial [Integer] -->
-                InfRefNum = doc.createElement("InfRefNum")
-                text_node = doc.createTextNode("1")
-                InfRefNum.appendChild(text_node)
-                BanInfRefItem.appendChild(InfRefNum)
-        #    <!-- N° de línea o N° Secuencial [Integer] -->
-                if self.l10n_co_edi_debit_origin_id.comprobantecfe:
-                        InfRefInd = doc.createElement("InfRefInd")
-                        text_node = doc.createTextNode("")
-                        InfRefInd.appendChild(text_node)
-                        BanInfRefItem.appendChild(InfRefInd)
-        #    <!-- Tipo CFE de referencia [String(20)] -->
-                        InfRefCFERef = doc.createElement("InfRefCFERef")
-                        text_node = doc.createTextNode(str(self.l10n_co_edi_debit_origin_id.tpo_cfe))
-                        InfRefCFERef.appendChild(text_node)
-                        BanInfRefItem.appendChild(InfRefCFERef)
-        #    <!-- Serie del CFE de referencia [String(2)] -->
-                        InfRefCFESerRef = doc.createElement("InfRefCFESerRef")
-                        text_node = doc.createTextNode(str(self.l10n_co_edi_debit_origin_id.serie_cfe))
-                        InfRefCFESerRef.appendChild(text_node)
-                        BanInfRefItem.appendChild(InfRefCFESerRef)
-        #    <!-- Número del CFE de referencia [Integer] -->
-                        InfRefCFENumRef = doc.createElement("InfRefCFENumRef")
-                        text_node = doc.createTextNode(str(self.l10n_co_edi_debit_origin_id.comprobantecfe))
-                        InfRefCFENumRef.appendChild(text_node)
-                        BanInfRefItem.appendChild(InfRefCFENumRef)
-        #    <!-- Razón referencia [String(90)] -->
-                        InfRefRazRef = doc.createElement("InfRefRazRef")
-                        BanInfRefItem.appendChild(InfRefRazRef)
-        #    <!-- Fecha CFE de referencia [Date] -->
-                        InfRefFchRef = doc.createElement("InfRefFchRef")
-                        BanInfRefItem.appendChild(InfRefFchRef)               
+                if self.origin:
+                        invoices = self.env['account.invoice'].search([('display_name','=',self.origin)])
+                        ref_count = 1
+                        for invoice in invoices:
+                                InfRefNum = doc.createElement("InfRefNum")
+                                text_node = doc.createTextNode(str(ref_count))
+                                InfRefNum.appendChild(text_node)
+                                BanInfRefItem.appendChild(InfRefNum)
+                                if invoice.comprobantecfe:
+                        #    <!-- Tipo CFE de referencia [String(20)] -->
+                                        InfRefCFERef = doc.createElement("InfRefCFERef")
+                                        text_node = doc.createTextNode(str(invoice.tpo_cfe))
+                                        InfRefCFERef.appendChild(text_node)
+                                        BanInfRefItem.appendChild(InfRefCFERef)
+                        #    <!-- Serie del CFE de referencia [String(2)] -->
+                                        InfRefCFESerRef = doc.createElement("InfRefCFESerRef")
+                                        text_node = doc.createTextNode(str(invoice.serie_cfe))
+                                        InfRefCFESerRef.appendChild(text_node)
+                                        BanInfRefItem.appendChild(InfRefCFESerRef)
+                        #    <!-- Número del CFE de referencia [Integer] -->
+                                        InfRefCFENumRef = doc.createElement("InfRefCFENumRef")
+                                        text_node = doc.createTextNode(str(invoice.comprobantecfe))
+                                        InfRefCFENumRef.appendChild(text_node)
+                                        BanInfRefItem.appendChild(InfRefCFENumRef)
+                        #    <!-- Razón referencia [String(90)] -->
+                                        InfRefRazRef = doc.createElement("InfRefRazRef")
+                                        BanInfRefItem.appendChild(InfRefRazRef)
+                        #    <!-- Fecha CFE de referencia [Date] -->
+                                        InfRefFchRef = doc.createElement("InfRefFchRef")
+                                        BanInfRefItem.appendChild(InfRefFchRef)               
+                                else:
+                                        InfRefInd = doc.createElement("InfRefInd")
+                                        text_node = doc.createTextNode("1")
+                                        InfRefInd.appendChild(text_node)
+                                        BanInfRefItem.appendChild(InfRefInd)
+                        #    <!-- Razón referencia [String(90)] -->
+                                        InfRefRazRef = doc.createElement("InfRefRazRef")
+                                        text_node = doc.createTextNode(str(self.origin_ref))
+                                        InfRefRazRef.appendChild(text_node)
+                                        BanInfRefItem.appendChild(InfRefRazRef)
+                        #    <!-- Fecha CFE de referencia [Date] -->
+                                        InfRefFchRef = doc.createElement("InfRefFchRef")
+                                        text_node = doc.createTextNode(str(self.origin_date))
+                                        InfRefFchRef.appendChild(text_node)
+                                        BanInfRefItem.appendChild(InfRefFchRef)
+                                ref_count += 1
                 else:
+                        InfRefNum = doc.createElement("InfRefNum")
+                        text_node = doc.createTextNode("1")
+                        InfRefNum.appendChild(text_node)
+                        BanInfRefItem.appendChild(InfRefNum)
+
                         InfRefInd = doc.createElement("InfRefInd")
                         text_node = doc.createTextNode("1")
                         InfRefInd.appendChild(text_node)
                         BanInfRefItem.appendChild(InfRefInd)
         #    <!-- Razón referencia [String(90)] -->
                         InfRefRazRef = doc.createElement("InfRefRazRef")
-                        text_node = doc.createTextNode(str(self.ref))
+                        text_node = doc.createTextNode(str(self.origin_ref))
                         InfRefRazRef.appendChild(text_node)
                         BanInfRefItem.appendChild(InfRefRazRef)
         #    <!-- Fecha CFE de referencia [Date] -->
                         InfRefFchRef = doc.createElement("InfRefFchRef")
-                        text_node = doc.createTextNode(str(self.l10n_co_edi_debit_origin_id.invoice_date))
+                        text_node = doc.createTextNode(str(self.origin_date))
                         InfRefFchRef.appendChild(text_node)
-                        BanInfRefItem.appendChild(InfRefFchRef)
+                        BanInfRefItem.appendChild(InfRefFchRef)                        
         # if with_invoice:
         # # <!-- Envia documento por mail a cliente S o N [String(1)] -->
         #         BanEnvFactMail = doc.createElement("BanEnvFactMail")
