@@ -290,8 +290,6 @@ class AccountInvice(models.Model):
                 self.estado = "Error"
 
     def update_invoice_status(self):
-        import wdb
-        wdb.set_trace()
         self.compute_defff()
         self.compute_estado()
 
