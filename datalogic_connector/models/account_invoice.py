@@ -88,7 +88,7 @@ class AccountInvice(models.Model):
                 XMLDocumento.appendChild(CfeNum)
 
                 CfeImpTot = doc.createElement("CfeImpTot")
-                text_node = doc.createTextNode(str(self.amount_residual))
+                text_node = doc.createTextNode(str(self.residual))
                 CfeImpTot.appendChild(text_node)
                 XMLDocumento.appendChild(CfeImpTot)
 
