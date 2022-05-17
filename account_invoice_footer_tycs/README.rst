@@ -21,7 +21,7 @@ Invoice Footer TyC
 
 |badge1| |badge2| |badge3|
 
-This module extends the functionality of ... to support ... and to allow you to ...
+This module adds TyC to the footer, between qr and CAE info 
 
 Install
 =======
@@ -56,6 +56,7 @@ Contributors
   
   * Cristian Paradiso
   * Gabriela Perez
+  * Deyker Gil
 
 Maintainers
 ~~~~~~~~~~~
@@ -69,4 +70,4 @@ This module is maintained by Calyx Servicios S.A.
 CALYX SERVICIOS S.A. is part of the PGK Consultores economic group, member of an important global network, a world organization.
 The PGK Consultores group is one of the 20 largest consultant-studios in Argentina with nearly 300 professionals.
 
-This module is part of the `Calyx <https://github.com/fbotti/dentons.git>`_ project on GitHub.
+This module is part of the `Dentons <https://github.com/fbotti/dentons.git>`_ project on GitHub.
