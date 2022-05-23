@@ -246,6 +246,9 @@ class AccountExportAgip(models.Model):
 
     def compute_agip_data(self):
         line = ''
+        jur_imp = 'Jur: 901 - Capital Federal'
+        account_tag_obj = self.env['account.account.tag']
+        jurAGIP = account_tag_obj.search([('name', '=', jur_imp)]).id
         for rec in self:
             if rec.doc_type == WITHHOLDINGPERCEPTION:
                 # Retenciones
@@ -286,17 +289,16 @@ class AccountExportAgip(models.Model):
                     line += _date_pay  
                     
                     # Campo 08 -- Monto del comprobante len 16
+                    # Campo 09 -- Nro certificado propio len 16
                     amount = 0.00
                     for pay_line in payment.payment_ids:
                         if pay_line.payment_method_id.code == 'withholding':
                             amount = pay_line.withholding_base_amount
+                            number = pay_line.withholding_number
                     
                     amount_str = '{:.2f}'.format(amount)
                     amount_str = amount_str.replace('.', ',')
                     line += amount_str.zfill(16)
-                    
-                    # Campo 09 -- Nro certificado propio len 16
-                    number = payment.withholding_number
                     line += number.rjust(16)
                     
                     # Campo 10 -- Tipo de documento del retenido len 1
@@ -308,16 +310,26 @@ class AccountExportAgip(models.Model):
                     line += payment.partner_id.vat.zfill(11)
                     
                     # Campo 12 -- Situacion IB del retenido len 1
-                    situation_ib = payment.partner_id.l10n_ar_gross_income_type
-                    code_situation_ib = IB_SITUATIONS.get(situation_ib, '1')
-                    line += code_situation_ib
-                    
                     # Campo 13 -- Nro inscripcion IB del retenido len 11
-                    nro_ib = payment.partner_id.l10n_ar_gross_income_number
-                    line += nro_ib.zfill(11)
+                    try:
+                        situation_ib = payment.partner_id.l10n_ar_gross_income_type
+                        code_situation_ib = IB_SITUATIONS.get(situation_ib, '1')
+                        if code_situation_ib != '4':
+                            nro_ib = payment.partner_id.l10n_ar_gross_income_number
+                        else:
+                            nro_ib = '0'
+                        
+                        line += code_situation_ib
+                        line += nro_ib.zfill(11)
+                    except Exception:
+                        raise UserError(
+                            _('The client %s does not have a complete situation '
+                            'regarding Gross Income.') %
+                            (payment.partner_id.vat)
+                        )
                     
                     # Campo 14 -- Situacion frente IVA del retenido len 1
-                    type_afip = payment.partner_id.l10_ar_afip_responsibility_type_id
+                    type_afip = payment.partner_id.l10n_ar_afip_responsibility_type_id
                     code_afip = IVA_SITUATIONS.get(type_afip, '1')
                     line += code_afip
                     
@@ -336,13 +348,8 @@ class AccountExportAgip(models.Model):
                     ret_amount = amount - iva_amount - other_amount
                     line += str(ret_amount).zfill(16)
                     
-                    agip_imp = 'Ret/Perc IIBB Aplicada'
-                    jur_imp = 'Jur: 901 - Capital Federal'
-                    account_tag_obj = self.env['account.account.tag']
-                    percAGIP = account_tag_obj.search([('name', '=', agip_imp)]).id
-                    jurAGIP = account_tag_obj.search([('name', '=', jur_imp)]).id
                     amount_alicout = 0
-                    for line_alicuot in invoice.partner_id.arba_alicuot_ids:
+                    for line_alicuot in payment.partner_id.arba_alicuot_ids:
                         if line_alicuot.tag_id == jurAGIP and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date: 
                             amount_alicout = line_alicuot.alicuota_retencion
                     
@@ -362,7 +369,6 @@ class AccountExportAgip(models.Model):
                     
                 # Percepciones
                 invoices = self.get_perception_invoices()
-                data = []
                 for invoice in invoices:
                     # Campo 01 -- Tipo de operacion len 1
                     line = '2'
@@ -377,7 +383,7 @@ class AccountExportAgip(models.Model):
                     # Campo 04 -- Tipo de comprobante len 2
                     # Campo 05 -- Letra del comprobante len 1
                     # Campo 06 -- Numero del comprobante len 16  
-                    doc_name = payment.display_name.split(' ')
+                    doc_name = invoice.name.split(' ')
                     if len(doc_name) > 0:
                         doc_type = doc_name[0].split('-')
                         code_prefix = DOCUMENT_TYPES.get(doc_type[0],'09')
@@ -415,16 +421,23 @@ class AccountExportAgip(models.Model):
                     line += invoice.partner_id.vat.zfill(11)
                     
                     # Campo 12 -- Situacion IB del percibido len 1
-                    situation_ib = invoice.partner_id.l10n_ar_gross_income_type
-                    code_situation_ib = IB_SITUATIONS.get(situation_ib, '1')
-                    line += code_situation_ib
-                    
                     # Campo 13 -- Nro inscripcion IB del percibido len 11
-                    nro_ib = invoice.partner_id.l10n_ar_gross_income_number
-                    line += nro_ib.zfill(11)
+                    try:
+                        situation_ib = invoice.partner_id.l10n_ar_gross_income_type
+                        code_situation_ib = IB_SITUATIONS.get(situation_ib, '1')
+                        nro_ib = invoice.partner_id.l10n_ar_gross_income_number
+                        
+                        line += code_situation_ib
+                        line += nro_ib.zfill(11)
+                    except Exception:
+                        raise UserError(
+                            _('The client %s does not have a complete situation '
+                            'regarding Gross Income.') %
+                            (invoice.partner_id.vat)
+                        )
                     
                     # Campo 14 -- Situacion frente IVA del percibido len 1
-                    type_afip = invoice.partner_id.l10_ar_afip_responsibility_type_id
+                    type_afip = invoice.partner_id.l10n_ar_afip_responsibility_type_id
                     code_afip = IVA_SITUATIONS.get(type_afip, '1')
                     line += code_afip
                     
@@ -443,11 +456,6 @@ class AccountExportAgip(models.Model):
                     ret_amount = amount - iva_amount - other_amount
                     line += str(ret_amount).zfill(16)
                     
-                    agip_imp = 'Ret/Perc IIBB Aplicada'
-                    jur_imp = 'Jur: 901 - Capital Federal'
-                    account_tag_obj = self.env['account.account.tag']
-                    percAGIP = account_tag_obj.search([('name', '=', agip_imp)]).id
-                    jurAGIP = account_tag_obj.search([('name', '=', jur_imp)]).id
                     amount_alicout = 0
                     for line_alicuot in invoice.partner_id.arba_alicuot_ids:
                         if line_alicuot.tag_id == jurAGIP and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date: 
@@ -501,18 +509,24 @@ class AccountExportAgip(models.Model):
                     
                     # Campo 07 -- Letra del comprobante len 1
                     # Campo 08 -- Nro de comprobante len 16
-                    doc_name = invoice.reversed_entry_id.name.split(' ')
-                    if len(doc_name) > 0:
-                        doc_type = doc_name[0].split('-')
-                        code_letter = doc_type[1]
-                        doc_number = doc_name[1].split('-')
-                        code_issue = doc_number[1]
-                    else:
-                        code_letter = ' '
-                        code_issue = 0
-                    
-                    line += str(code_letter)
-                    line += str(code_issue).zfill(16)
+                    try:
+                        doc_name = invoice.reversed_entry_id.name.split(' ')
+                        if len(doc_name) > 0:
+                            doc_type = doc_name[0].split('-')
+                            code_letter = doc_type[1]
+                            doc_number = doc_name[1].split('-')
+                            code_issue = doc_number[1]
+                        else:
+                            code_letter = ' '
+                            code_issue = 0
+                        
+                        line += str(code_letter)
+                        line += str(code_issue).zfill(16)
+                    except Exception:
+                        raise UserError(
+                            _('The invoice line does not have an associated '
+                            'voucher.')
+                        )
                     
                     # Campo 09 -- Nro de documento del retenido len 11
                     line += str(invoice.partner_id.vat).zfill(11)
@@ -524,11 +538,6 @@ class AccountExportAgip(models.Model):
                     _date_per = invoice.invoice_date.strftime('%d/%m/%Y')
                     line += _date_per
                     
-                    agip_imp = 'Ret/Perc IIBB Aplicada'
-                    jur_imp = 'Jur: 901 - Capital Federal'
-                    account_tag_obj = self.env['account.account.tag']
-                    percAGIP = account_tag_obj.search([('name', '=', agip_imp)]).id
-                    jurAGIP = account_tag_obj.search([('name', '=', jur_imp)]).id
                     amount_alicout = 0
                     for line_alicuot in invoice.partner_id.arba_alicuot_ids:
                         if line_alicuot.tag_id == jurAGIP and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date: 

@@ -11,6 +11,8 @@
     "license": "AGPL-3",
     "category": "Account",
     "version": "13.0.1.0.0",
+    'installable': True,
+    'application': False,
     "depends": [
         "base",
         "account",
