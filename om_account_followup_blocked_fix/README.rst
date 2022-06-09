@@ -1,6 +1,6 @@
-===========
+================================================
 Customer Follow Up Management (Fix Blocked mail)
-===========
+================================================
 
 .. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
    !! This file is intended to be in every module    !!
@@ -15,9 +15,9 @@ Customer Follow Up Management (Fix Blocked mail)
 .. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
-.. |badge3| image:: https://img.shields.io/badge/github-calyx--servicios%2Fcalyx-lightgray.png?logo=github
-    :target: https://github.com/calyx-servicios/calyx.git
-    :alt: calyx-servicios/calyx.git
+.. |badge3| image:: https://img.shields.io/badge/github-calyx--servicios%2Faccount--invoicing-lightgray.png?logo=github
+    :target: https://github.com/calyx-servicios/account-invoicing.git
+    :alt: calyx-servicios/account-invoicing.git
 
 |badge1| |badge2| |badge3|
 
@@ -31,17 +31,6 @@ This module fixes the functionality of the om_account_followup module to correct
    :local:
 
 .. !!! Instalation: must only be present if there are very specific installation instructions, such as installing non-python dependencies.The audience is systems administrators. ] To install this module, you need to: !!!
-
-Install
-=======
-
-# Installation guide
-
-.. !!! Configuration: This file is optional, it should explain how to configure the module before using it; it is aimed at advanced users. To configure this module, you need to:
-
-Configure
-=========
-
 
 
 Usage
@@ -76,6 +65,7 @@ Contributors
   * Cristian Paradiso
   * Gabriela Perez
   * Marco Oegg
+  * Pablo Perez
 
 Maintainers
 ~~~~~~~~~~~
@@ -89,4 +79,4 @@ This module is maintained by Calyx Servicios S.A.
 CALYX SERVICIOS S.A. is part of the PGK Consultores economic group, member of an important global network, a world organization.
 The PGK Consultores group is one of the 20 largest consultant-studios in Argentina with nearly 300 professionals.
 
-This module is part of the `Calyx <https://github.com/calyx-servicios/calyx.git>`_ project on GitHub.
+This module is part of the `Account Invoicing <https://github.com/calyx-servicios/account-invoicing.git>`_ project on GitHub.

@@ -3,10 +3,10 @@
 {
     "name": "Customer Follow Up Management (Fix Blocked mail)",
     "summary": """
-        Summary of the module's purpose
+        This module fixes the functionality of the om_account_followup module to correct email sending excluding the documents that were marked as blocked (without following).
     """,
     "author": "Calyx Servicios S.A.",
-    "maintainers": ['gpperez'],
+    "maintainers": ["gpperez"],
     "website": "https://odoo.calyx-cloud.com.ar/",
     "license": "AGPL-3",
     "category": "Accounting",
@@ -14,10 +14,5 @@
     "development_status": "Production/Stable",
     "application": False,
     "installable": True,
-    "external_dependencies": {
-        "python": [],
-        "bin": [],
-    },
-    "depends": ['om_account_followup'],
-
+    "depends": ["om_account_followup"],
 }
