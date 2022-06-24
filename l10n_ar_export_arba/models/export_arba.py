@@ -103,7 +103,7 @@ class AccountExportArba(models.Model):
         """
         for rec in self:
             if rec.doc_type == WITHHOLDING:
-                rec.fortnight = 0
+                rec.fortnight = '0'
 
             month = rec.month
             year = int(rec.year)
@@ -141,7 +141,7 @@ class AccountExportArba(models.Model):
             else:
                 _type = 'PERCEPTION'
             
-            filename = 'AR-%s-%s-%s.txt' % (cuit, _date, _type)
+            filename = 'AR-%s-%s%s-%s.txt' % (cuit, _date, rec.fortnight, _type)
             rec.export_arba_filename = filename
             if rec.export_arba_data:
                 rec.export_arba_file = base64.encodebytes(
@@ -192,7 +192,7 @@ class AccountExportArba(models.Model):
             ('invoice_date', '>=', self.date_from),
             ('invoice_date', '<=', self.date_to),
             ('type', 'in', ['out_invoice','out_refund']),
-            ('invoice_payment_state', '=', 'paid')
+            ('state', '=', 'posted')
         ])
         
         per = invoice_obj      
@@ -239,7 +239,9 @@ class AccountExportArba(models.Model):
                     # Campo 5 Importe de la retencion len 11
                     for pay_line in payment.payment_ids:
                         if pay_line.payment_method_id.code == 'withholding':
-                            line += str(pay_line.amount).zfill(11)
+                            amount_ret = '{:.2f}'.format(pay_line.amount)
+                            amount_ret = amount_ret.replace('.', ',')
+                            line += str(amount_ret).zfill(11)
 
                     # Campo 6 Tipo Operación len 1
                     line += 'A'
@@ -297,14 +299,21 @@ class AccountExportArba(models.Model):
                     
                     # Campo 07 -- Monto imponible len 12
                     # Campo 08 -- Importe de Percepción len 11
+                    amount_untaxed = '{:.2f}'.format(invoice.amount_untaxed)
+                    amount_untaxed = amount_untaxed.replace('.', ',')
+                    amount_tax = '{:.2f}'.format(amount)
+                    amount_tax = amount_tax.replace('.', ',')
                     if code_prefix == 'C' or code_prefix == 'H':
                         sign = '-'
-                        line += sign + str(invoice.amount_untaxed).zfill(11)
-                        line += sign + str(amount).zfill(10)
+                        line += sign + str(amount_untaxed).zfill(11)
+                        line += sign + str(amount_tax).zfill(10)
                     else:
-                        line += str(invoice.amount_untaxed).zfill(12)
-                        line += str(amount).zfill(11)
-
+                        line += str(amount_untaxed).zfill(12)
+                        line += str(amount_tax).zfill(11)
+                    
+                    # Campo 09 -- Tipo Operación len 1
+                    line += 'A'
+                    
                     data.append(line)
             
             rec.export_arba_data = '\n'.join(data)
