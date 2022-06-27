@@ -114,7 +114,7 @@ class AccountExportAgip(models.Model):
         """
         for rec in self:
             if rec.doc_type == WITHHOLDINGPERCEPTION:
-                rec.fortnight = 0
+                rec.fortnight = '0'
 
             month = rec.month
             year = int(rec.year)
@@ -152,7 +152,7 @@ class AccountExportAgip(models.Model):
             else:
                 _type = 'CREDIT-NOTE'
             
-            filename = 'AR-%s-%s-%s.txt' % (cuit, _date, _type)
+            filename = 'AR-%s-%s%s-%s.txt' % (cuit, _date, rec.fortnight, _type)
             rec.export_agip_filename = filename
             if rec.export_agip_data:
                 rec.export_agip_file = base64.encodebytes(
@@ -203,7 +203,7 @@ class AccountExportAgip(models.Model):
             ('invoice_date', '>=', self.date_from),
             ('invoice_date', '<=', self.date_to),
             ('type', '=', 'out_invoice'),
-            ('invoice_payment_state', '=', 'paid')
+            ('state', '=', 'posted')
         ])
         
         per = invoice_obj      
@@ -231,7 +231,7 @@ class AccountExportAgip(models.Model):
             ('invoice_date', '>=', self.date_from),
             ('invoice_date', '<=', self.date_to),
             ('type', '=', 'out_refund'),
-            ('invoice_payment_state', '=', 'paid')
+            ('state', '=', 'posted')
         ])
         
         per = invoice_obj      
@@ -299,7 +299,10 @@ class AccountExportAgip(models.Model):
                     amount_str = '{:.2f}'.format(amount)
                     amount_str = amount_str.replace('.', ',')
                     line += amount_str.zfill(16)
-                    line += number.rjust(16)
+                    if number:
+                        line += number.zfill(16)
+                    else:
+                        line += ''.rjust(16)
                     
                     # Campo 10 -- Tipo de documento del retenido len 1
                     type_doc = payment.partner_id.l10n_latam_identification_type_id.l10n_ar_afip_code
@@ -337,20 +340,26 @@ class AccountExportAgip(models.Model):
                     line += payment.partner_id.name.rjust(30)
                     
                     # Campo 16 -- Importe otros conceptos len 16
-                    other_amount = 0.00
+                    other_amount_int = 0.00
+                    other_amount = '{:.2f}'.format(other_amount_int)
+                    other_amount = other_amount.replace('.', ',')
                     line += str(other_amount).zfill(16)
                     
                     # Campo 17 -- Importe IVA len 16
-                    iva_amount = 0.00
+                    iva_amount_int = 0.00
+                    iva_amount = '{:.2f}'.format(iva_amount_int)
+                    iva_amount = iva_amount.replace('.', ',')
                     line += str(iva_amount).zfill(16)
                     
                     # Campo 18 -- Monto sujeto a retencion len 16
-                    ret_amount = amount - iva_amount - other_amount
+                    ret_amount_int = amount - iva_amount_int - other_amount_int
+                    ret_amount = '{:.2f}'.format(ret_amount_int)
+                    ret_amount = ret_amount.replace('.', ',')
                     line += str(ret_amount).zfill(16)
-                    
+
                     amount_alicout = 0
                     for line_alicuot in payment.partner_id.arba_alicuot_ids:
-                        if line_alicuot.tag_id == jurAGIP and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date: 
+                        if line_alicuot.tag_id.id == jurAGIP and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date: 
                             amount_alicout = line_alicuot.alicuota_retencion
                     
                     # Campo 19 -- Alicuota len 5 
@@ -359,7 +368,9 @@ class AccountExportAgip(models.Model):
                     line += amount_alicout_str.zfill(5)
                     
                     # Campo 20 -- Retencion practicada len 16
-                    amount_total = (ret_amount * amount_alicout) / 100
+                    amount_total = (ret_amount_int * amount_alicout) / 100
+                    amount_total = '{:.2f}'.format(amount_total)
+                    amount_total = amount_total.replace('.', ',')
                     line += str(amount_total).zfill(16)       
                     
                     # Campo 21 -- Monto total retenido len 16
@@ -407,7 +418,7 @@ class AccountExportAgip(models.Model):
                     amount = invoice.amount_untaxed
                     amount_str = '{:.2f}'.format(amount)
                     amount_str = amount_str.replace('.', ',')
-                    line += amount_str.zfill(16)
+                    line += str(amount_str).zfill(16)
                     
                     # Campo 09 -- Nro certificado propio len 16
                     line += ''.rjust(16)
@@ -445,29 +456,37 @@ class AccountExportAgip(models.Model):
                     line += invoice.partner_id.name.rjust(30)
                     
                     # Campo 16 -- Importe otros conceptos len 16
-                    other_amount = 0.00
+                    other_amount_int = 0.00
+                    other_amount = '{:.2f}'.format(other_amount_int)
+                    other_amount = other_amount.replace('.', ',')
                     line += str(other_amount).zfill(16)
                     
                     # Campo 17 -- Importe IVA len 16
-                    iva_amount = 0.00
+                    iva_amount_int = 0.00
+                    iva_amount = '{:.2f}'.format(iva_amount_int)
+                    iva_amount = iva_amount.replace('.', ',')
                     line += str(iva_amount).zfill(16)
                     
                     # Campo 18 -- Monto sujeto a percepcion len 16
-                    ret_amount = amount - iva_amount - other_amount
+                    ret_amount_int = amount - iva_amount_int - other_amount_int
+                    ret_amount = '{:.2f}'.format(ret_amount_int)
+                    ret_amount = ret_amount.replace('.', ',')
                     line += str(ret_amount).zfill(16)
                     
                     amount_alicout = 0
                     for line_alicuot in invoice.partner_id.arba_alicuot_ids:
-                        if line_alicuot.tag_id == jurAGIP and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date: 
+                        if line_alicuot.tag_id.id == jurAGIP and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date: 
                             amount_alicout = line_alicuot.alicuota_percepcion
                     
                     # Campo 19 -- Alicuota len 5 
                     amount_alicout_str = '{:.2f}'.format(amount_alicout)
                     amount_alicout_str = amount_alicout_str.replace('.', ',')
-                    line += amount_alicout_str.zfill(5)
+                    line += str(amount_alicout_str).zfill(5)
                     
                     # Campo 20 -- Percepcion practicada len 16
-                    amount_total = (ret_amount * amount_alicout) / 100
+                    amount_total = (ret_amount_int * amount_alicout) / 100
+                    amount_total = '{:.2f}'.format(amount_total)
+                    amount_total = amount_total.replace('.', ',')
                     line += str(amount_total).zfill(16)       
                     
                     # Campo 21 -- Monto total percibido len 16
@@ -499,7 +518,7 @@ class AccountExportAgip(models.Model):
                     amount = invoice.amount_untaxed
                     amount_str = '{:.2f}'.format(amount)
                     amount_str = amount_str.replace('.', ',')
-                    line += amount_str.zfill(16)
+                    line += str(amount_str).zfill(16)
                     
                     # Campo 05 -- Nro certificado propio len 16
                     line += "".rjust(16)
@@ -540,7 +559,7 @@ class AccountExportAgip(models.Model):
                     
                     amount_alicout = 0
                     for line_alicuot in invoice.partner_id.arba_alicuot_ids:
-                        if line_alicuot.tag_id == jurAGIP and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date: 
+                        if line_alicuot.tag_id.id == jurAGIP and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date: 
                             amount_alicout = line_alicuot.alicuota_percepcion
                     
                     # Campo 12 -- Ret/Percep a deducir len 16
@@ -549,7 +568,7 @@ class AccountExportAgip(models.Model):
                     amount_alicout_str = '{:.2f}'.format(amount_alicout)
                     amount_alicout_str = amount_alicout_str.replace('.', ',')
                     line += str(amount_total).zfill(16)          
-                    line += amount_alicout_str.zfill(5)
+                    line += str(amount_alicout_str).zfill(5)
 
                     data.append(line)
             
