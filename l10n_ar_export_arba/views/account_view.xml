@@ -16,6 +16,7 @@
 	                    <group>
 	                        <field name="year" style="width: 30%" />
 	                        <field name="month" style="width: 30%" />
+	                        <field name="fortnight"/>
 	                    </group>
 	                </group>
 	                <group colspan="4">
