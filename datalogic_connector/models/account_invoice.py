@@ -514,7 +514,23 @@ class AccountInvice(models.Model):
         text_node = doc.createTextNode(str(22.000))
         BanTasaIVABas.appendChild(text_node)
         Bandeja.appendChild(BanTasaIVABas)
-                        
+#<!-- Cláusula de venta (Incoterms: FOB, CIF, etc) [String(3)] -->
+        if self.journal_document_type_id.document_type_id.code in ["121","122","123"]:
+                BanClaVen = doc.createElement("BanClaVen")
+                text_node = doc.createTextNode("N/A")
+                BanClaVen.appendChild(text_node)
+                Bandeja.appendChild(BanClaVen)
+#<!-- Indica el medio de transporte en que se traslada la mercadería [String(20)]-->
+                BanModVen = doc.createElement("BanModVen")
+                text_node = doc.createTextNode("90")
+                BanModVen.appendChild(text_node)
+                Bandeja.appendChild(BanModVen)
+#<!-- Indica el medio de transporte en que se traslada la mercadería [String(20)]-->
+                BanViaTra = doc.createElement("BanViaTra")
+                text_node = doc.createTextNode("8")
+                BanViaTra.appendChild(text_node)
+                Bandeja.appendChild(BanViaTra)
+
 # <!-- Renglones del producto-->
         BanLin = doc.createElement("BanLin")
         monto_no_grabado = 0
@@ -547,6 +563,8 @@ class AccountInvice(models.Model):
             if ind_fact == "1":
                 price_unit = line.price_unit
                 monto_no_grabado += line.price_subtotal
+                if self.journal_document_type_id.document_type_id.code not in ["111","112","113"]:
+                        ind_fact = "10"
 
             IndFac = doc.createElement("IndFac")
             text_node = doc.createTextNode(ind_fact)
@@ -626,10 +644,16 @@ class AccountInvice(models.Model):
            BanTpoCam.appendChild(text_node)
            Bandeja.appendChild(BanTpoCam)
 # <!-- monto sin iva -->
-        BanTMonNoGra = doc.createElement("BanTMonNoGra")
-        text_node = doc.createTextNode(str(monto_no_grabado))
-        BanTMonNoGra.appendChild(text_node)
-        Bandeja.appendChild(BanTMonNoGra)
+        if self.journal_document_type_id.document_type_id.code in ["111","112","113"]:
+                BanTMonNoGra = doc.createElement("BanTMonNoGra")
+                text_node = doc.createTextNode(str(monto_no_grabado))
+                BanTMonNoGra.appendChild(text_node)
+                Bandeja.appendChild(BanTMonNoGra)
+        else:
+                BanTMonExpAsi = doc.createElement("BanTMonExpAsi")
+                text_node = doc.createTextNode(str(monto_no_grabado))
+                BanTMonExpAsi.appendChild(text_node)
+                Bandeja.appendChild(BanTMonExpAsi)
 # <!-- monto con iva min-->
         BanTMonNetIMin = doc.createElement("BanTMonNetIMin")
         text_node = doc.createTextNode(str(monto_iva_min))
