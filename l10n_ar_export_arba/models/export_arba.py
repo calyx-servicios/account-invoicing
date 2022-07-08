@@ -150,16 +150,10 @@ class AccountExportArba(models.Model):
             else:
                 rec.export_arba_file = False
 
-    def get_withholding_payments(self):
+    def get_withholding_payments(self, retARBA, jurARBA):
         """ 
         Obtains the supplier payments that are withholdings and that are in the selected period
         """
-        arba_imp = 'Ret/Perc IIBB Aplicada'
-        jur_imp = 'Jur: 902 - Buenos Aires'
-        account_tag_obj = self.env['account.account.tag']
-        retARBA = account_tag_obj.search([('name', '=', arba_imp)]).id
-        jurARBA = account_tag_obj.search([('name', '=', jur_imp)]).id
-        
         payment_obj = self.env['account.payment.group'].sudo()
         payments = payment_obj.search([
             ('payment_date', '>=', self.date_from),
@@ -177,16 +171,10 @@ class AccountExportArba(models.Model):
         
         return ret
 
-    def get_perception_invoices(self):
+    def get_perception_invoices(self, percARBA, jurARBA):
         """
         Gets the customer invoices that have perceptions and that are in the selected period.
         """
-        arba_imp = 'Ret/Perc IIBB Aplicada'
-        jur_imp = 'Jur: 902 - Buenos Aires'
-        account_tag_obj = self.env['account.account.tag']
-        percARBA = account_tag_obj.search([('name', '=', arba_imp)]).id
-        jurARBA = account_tag_obj.search([('name', '=', jur_imp)]).id
-        
         invoice_obj = self.env['account.move'].sudo()
         invoices = invoice_obj.search([
             ('invoice_date', '>=', self.date_from),
@@ -207,10 +195,15 @@ class AccountExportArba(models.Model):
 
     def compute_arba_data(self):
         line = ''
+        account_tag_obj = self.env['account.account.tag']
+        arba_imp = self.env.ref("l10n_ar_ux.tag_ret_perc_iibb_aplicada")
+        arba_jur = self.env.ref("l10n_ar_ux.tag_tax_jurisdiccion_902")
+        impARBA = account_tag_obj.search([('id', '=', arba_imp.id)]).id
+        jurARBA = account_tag_obj.search([('id', '=', arba_jur.id)]).id
         for rec in self:
             if rec.doc_type == WITHHOLDING:
                 # Retenciones
-                payments = self.get_withholding_payments()
+                payments = self.get_withholding_payments(impARBA, jurARBA)
                 data = []
                 for payment in payments:       
                     # Campo 01 -- Cuit contribuyente retenido len 13
@@ -249,7 +242,7 @@ class AccountExportArba(models.Model):
                     data.append(line)
             else:
                 # Percepciones
-                invoices = self.get_perception_invoices()
+                invoices = self.get_perception_invoices(impARBA, jurARBA)
                 data = []
                 for invoice in invoices:
                     # Campo 01 -- Cuit contribuyente percibido len 13
@@ -267,6 +260,10 @@ class AccountExportArba(models.Model):
                     # Campo 04 -- Letra de comprobante len 1
                     # Campo 05 -- Número sucursal len 4
                     # Campo 06 -- Número emisión len 8
+                    code_prefix = ' '
+                    code_letter = ' '
+                    code_office = 0
+                    code_issue = 0
                     doc_name = invoice.name.split(' ')
                     if len(doc_name) > 0:
                         doc_type = doc_name[0].split('-')
@@ -275,27 +272,16 @@ class AccountExportArba(models.Model):
                         doc_number = doc_name[1].split('-')
                         code_office = doc_number[0][-4:]
                         code_issue = doc_number[1]
-                    else:
-                        code_prefix = ' '
-                        code_letter = ' '
-                        code_office = 0
-                        code_issue = 0
                         
                     line += str(code_prefix)
                     line += str(code_letter)
                     line += str(code_office)
                     line += str(code_issue)
-                        
-                    arba_imp = 'Ret/Perc IIBB Aplicada'
-                    jur_imp = 'Jur: 902 - Buenos Aires'
-                    account_tag_obj = self.env['account.account.tag']
-                    percARBA = account_tag_obj.search([('name', '=', arba_imp)]).id
-                    jurARBA = account_tag_obj.search([('name', '=', jur_imp)]).id
-                    for inv_line in invoice.invoice_line_ids:                 
-                        for tax in inv_line.tax_ids:
-                            for tax_line in tax.invoice_repartition_line_ids:
-                                if percARBA in tax_line.tag_ids.ids and jurARBA in tax_line.tag_ids.ids:
-                                    amount = tax.amount
+                    
+                    amount = 0
+                    for inv_line in invoice.line_ids:
+                        if impARBA in inv_line.tag_ids.ids and jurARBA in inv_line.tag_ids.ids:
+                            amount = inv_line.credit
                     
                     # Campo 07 -- Monto imponible len 12
                     # Campo 08 -- Importe de Percepción len 11

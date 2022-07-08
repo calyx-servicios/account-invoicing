@@ -161,16 +161,10 @@ class AccountExportAgip(models.Model):
             else:
                 rec.export_agip_file = False
 
-    def get_withholding_payments(self):
+    def get_withholding_payments(self, retAGIP, jurAGIP):
         """ 
         Obtains the supplier payments that are withholdings and that are in the selected period
         """
-        agip_imp = 'Ret/Perc IIBB Aplicada'
-        jur_imp = 'Jur: 901 - Capital Federal'
-        account_tag_obj = self.env['account.account.tag']
-        retAGIP = account_tag_obj.search([('name', '=', agip_imp)]).id
-        jurAGIP = account_tag_obj.search([('name', '=', jur_imp)]).id
-        
         payment_obj = self.env['account.payment.group'].sudo()
         payments = payment_obj.search([
             ('payment_date', '>=', self.date_from),
@@ -188,16 +182,10 @@ class AccountExportAgip(models.Model):
         
         return ret
 
-    def get_perception_invoices(self):
+    def get_perception_invoices(self, percAGIP, jurAGIP):
         """
         Gets the customer invoices that have perceptions and that are in the selected period.
         """
-        agip_imp = 'Ret/Perc IIBB Aplicada'
-        jur_imp = 'Jur: 901 - Capital Federal'
-        account_tag_obj = self.env['account.account.tag']
-        percAGIP = account_tag_obj.search([('name', '=', agip_imp)]).id
-        jurAGIP = account_tag_obj.search([('name', '=', jur_imp)]).id
-        
         invoice_obj = self.env['account.move'].sudo()
         invoices = invoice_obj.search([
             ('invoice_date', '>=', self.date_from),
@@ -216,16 +204,10 @@ class AccountExportAgip(models.Model):
                             
         return per
     
-    def get_perception_credit_notes(self):
+    def get_perception_credit_notes(self, percAGIP, jurAGIP):
         """
         Gets the customer credit notes that have perceptions and that are in the selected period.
         """
-        agip_imp = 'Ret/Perc IIBB Aplicada'
-        jur_imp = 'Jur: 901 - Capital Federal'
-        account_tag_obj = self.env['account.account.tag']
-        percAGIP = account_tag_obj.search([('name', '=', agip_imp)]).id
-        jurAGIP = account_tag_obj.search([('name', '=', jur_imp)]).id
-        
         invoice_obj = self.env['account.move'].sudo()
         invoices = invoice_obj.search([
             ('invoice_date', '>=', self.date_from),
@@ -246,13 +228,15 @@ class AccountExportAgip(models.Model):
 
     def compute_agip_data(self):
         line = ''
-        jur_imp = 'Jur: 901 - Capital Federal'
         account_tag_obj = self.env['account.account.tag']
-        jurAGIP = account_tag_obj.search([('name', '=', jur_imp)]).id
+        arba_imp = self.env.ref("l10n_ar_ux.tag_ret_perc_iibb_aplicada")
+        arba_jur = self.env.ref("l10n_ar_ux.tag_tax_jurisdiccion_901")
+        impAGIP = account_tag_obj.search([('id', '=', arba_imp.id)]).id
+        jurAGIP = account_tag_obj.search([('id', '=', arba_jur.id)]).id
         for rec in self:
             if rec.doc_type == WITHHOLDINGPERCEPTION:
                 # Retenciones
-                payments = self.get_withholding_payments()
+                payments = self.get_withholding_payments(impAGIP, jurAGIP)
                 data = []
                 for payment in payments:
                     # Campo 01 -- Tipo de operacion len 1
@@ -379,7 +363,7 @@ class AccountExportAgip(models.Model):
                     data.append(line)
                     
                 # Percepciones
-                invoices = self.get_perception_invoices()
+                invoices = self.get_perception_invoices(impAGIP, jurAGIP)
                 for invoice in invoices:
                     # Campo 01 -- Tipo de operacion len 1
                     line = '2'
@@ -495,7 +479,7 @@ class AccountExportAgip(models.Model):
                     data.append(line)
             else:
                 # Percepciones
-                invoices = self.get_perception_credit_notes()
+                invoices = self.get_perception_credit_notes(impAGIP, jurAGIP)
                 data = []
                 for invoice in invoices:
                     # Campo 01 -- Tipo de operacion len 1
