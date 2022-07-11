@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Partner needed to create the JWT Calyx API Invoice and Payments Static User -->
+    <record id="jwt_cx_api_invoice_payments_static_user_partner" model="res.partner">
+        <field name="name">JWT Calyx API Invoice and Payments Static User Partner</field>
+        <field name="company_id" ref="base.main_company" />
+    </record>
+
+    <!-- User to be used in jwt validator with settings rights -->
+    <record id="jwt_cx_api_invoice_payments_static_user" model="res.users">
+        <field name="partner_id" ref="jwt_cx_api_invoice_payments_static_user_partner" />
+        <field name="login">jwt_cx_api_invoice_payments_static_user</field>
+        <field name="password">*sFgDQUD9w%E2Pvj#EMu</field>
+        <field name="company_id" ref="base.main_company" />
+        <field name="company_ids" eval="[(4, ref('base.main_company'))]" />
+        <field name="groups_id" eval="[(6, 0, [ref('base.group_system')])]" />
+    </record>
+
+</odoo>
