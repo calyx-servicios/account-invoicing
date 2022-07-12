@@ -1,0 +1,155 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_ar_export_sircar
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-07-04 20:21+0000\n"
+"PO-Revision-Date: 2022-07-04 20:21+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__create_uid
+msgid "Created by"
+msgstr "Creado por"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__create_date
+msgid "Created on"
+msgstr "Creado el"
+
+#. module: l10n_ar_export_sircar
+#: model_terms:ir.ui.view,arch_db:l10n_ar_export_sircar.view_account_export_sircar_form
+msgid "Days of period"
+msgstr "Días del periódo"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__display_name
+msgid "Display Name"
+msgstr "Nombre a mostrar"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__export_sircar_file
+msgid "Download File"
+msgstr "Descargar archivo"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.actions.act_window,name:l10n_ar_export_sircar.action_account_export_sircar
+#: model:ir.ui.menu,name:l10n_ar_export_sircar.menu_account_export_sircar
+msgid "Export SIRCAR"
+msgstr "Exportaciones SIRCAR"
+
+#. module: l10n_ar_export_sircar
+#: code:addons/l10n_ar_export_sircar/models/export_sircar.py:0
+#: model:ir.model,name:l10n_ar_export_sircar.model_account_export_sircar
+#, python-format
+msgid "Export file for SIRCAR"
+msgstr "Exportar archivo para SIRCAR"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__export_sircar_filename
+msgid "File SIRCAR"
+msgstr "Archivo SIRCAR"
+
+#. module: l10n_ar_export_sircar
+#: model_terms:ir.ui.view,arch_db:l10n_ar_export_sircar.view_account_export_sircar_form
+msgid "File and data"
+msgstr "Archivo y datos"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__export_sircar_data
+msgid "File content"
+msgstr "Contenido del archivo"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__date_from
+msgid "From"
+msgstr "Desde"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__id
+msgid "ID"
+msgstr "Id"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__tag_tax
+msgid "Jurisdiction"
+msgstr "Jurisdicción"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar____last_update
+msgid "Last Modified on"
+msgstr "Última modificación el"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__write_uid
+msgid "Last Updated by"
+msgstr "Última actualización por"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__write_date
+msgid "Last Updated on"
+msgstr "Última actualización el"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__month
+msgid "Month"
+msgstr "Mes"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,help:l10n_ar_export_sircar.field_account_export_sircar__month
+msgid "Month of the period"
+msgstr "Mes del periódo"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields.selection,name:l10n_ar_export_sircar.selection__account_export_sircar__doc_type__2
+msgid "Perception"
+msgstr "Percepción"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__period
+msgid "Period"
+msgstr "Periódo"
+
+#. module: l10n_ar_export_sircar
+#: model_terms:ir.ui.view,arch_db:l10n_ar_export_sircar.view_account_export_sircar_form
+msgid "Regenerate SIRCAR"
+msgstr "Regenerar SIRCAR"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__date_to
+msgid "To"
+msgstr "Hasta"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__doc_type
+msgid "Type of file"
+msgstr "Tipo de archivo"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields.selection,name:l10n_ar_export_sircar.selection__account_export_sircar__doc_type__1
+msgid "Withholding"
+msgstr "Retención"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,field_description:l10n_ar_export_sircar.field_account_export_sircar__year
+msgid "Year"
+msgstr "Año"
+
+#. module: l10n_ar_export_sircar
+#: model:ir.model.fields,help:l10n_ar_export_sircar.field_account_export_sircar__year
+msgid "Year of the period"
+msgstr "Año del periódo"
+
+#. module: l10n_ar_export_sircar
+#: code:addons/l10n_ar_export_sircar/models/export_sircar.py:0
+#, python-format
+msgid "You have not configured the CUIT for this company"
+msgstr "No tienes configurado el CUIT para esta empresa"
