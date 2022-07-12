@@ -49,18 +49,28 @@ Code example::
     import requests
     from jose import jwt
 
+<<<<<<< HEAD
 
     DB_NAME = "13-bitex-test-1"
 
     BASE_URL = "http://localhost:8069"
 
     AUTH_URL = f"{BASE_URL}/account/create/invoice"
+=======
+    BASE_URL = "http://localhost:8069"
+
+    CREATE_INVOICE_URL = f"{BASE_URL}/account/create/invoice"
+>>>>>>> add_cx_api_invoice_payments
 
     TOKEN = jwt.encode(
         {
             "aud": "cx_api_invoice_payments",
             "iss": "issuer",
+<<<<<<< HEAD
             "exp": time.time() + 600000,
+=======
+            "exp": time.time() + 600,
+>>>>>>> add_cx_api_invoice_payments
             "email": "admin",
         },
         key="secretkey",  # They key is set in Odoo JWT Validators configuration.
@@ -96,7 +106,11 @@ Code example::
             },
         }
 
+<<<<<<< HEAD
         res = requests.post(AUTH_URL, data=json.dumps(data), headers=headers)
+=======
+        res = requests.post(CREATE_INVOICE_URL, data=json.dumps(data), headers=headers)
+>>>>>>> add_cx_api_invoice_payments
         res = json.loads(res.content)
         print(res)
         # {
