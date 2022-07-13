@@ -113,7 +113,7 @@ def add_lines_to_invoice(invoice: models.Model, lines: list) -> dict or bool:
 
     * Taxes: Optional (name or id). Default is product's taxes. If not taxes are found,
     and the product does not have a default tax, this will return an error.
-    If more than one Argentinian IVA Tax Type is added, will return an error. [taxes[dict]]
+    If more than one Argentinian IVA Tax Type is added, will return an error. [taxes[list]]
 
     * Price Unit: Optional. Default is product's list price. [price_unit]
 
@@ -373,12 +373,7 @@ class ApiInvoicePaymentsControllers(http.Controller):
 
         invoice.action_post()
 
-        # Create payments if any
-        payments = kwargs.get("payments")
-        if payments:
-            payment_group = create_and_post_payments(payments, invoice)
-
-        return {
+        res = {
             "result": "Invoice created",
             "invoice_id": invoice.id,
             "invoice_number": invoice.display_name,
@@ -389,8 +384,18 @@ class ApiInvoicePaymentsControllers(http.Controller):
             "invoice_journal": invoice.journal_id.name,
             "invoice_partner": invoice.partner_id.name,
             "invoice_partner_vat": invoice.partner_id.vat,
-            "payment_group_id": payment_group.id,
-            "payment_group_number": payment_group.display_name,
-            "payment_group_amount": payment_group.payments_amount,
-            "payment_group_state": payment_group.state,
         }
+
+        # Create payments if any
+        payments = kwargs.get("payments")
+        if payments:
+            payment_group = create_and_post_payments(payments, invoice)
+            if isinstance(payment_group, dict) and payment_group.get("error"):
+                return payment_group
+            res["result"] = "Invoice created and payments posted"
+            res["payment_group_id"] = payment_group.id
+            res["payment_group_number"] = payment_group.display_name
+            res["payment_group_amount"] = payment_group.payments_amount
+            res["payment_group_state"] = payment_group.state
+
+        return res

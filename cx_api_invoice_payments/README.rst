@@ -100,7 +100,7 @@ Code example::
         #     "jsonrpc": "2.0",
         #     "id": null,
         #     "result": {
-        #         "result": "Invoice created",
+        #         "result": "Invoice created and payments posted",
         #         "invoice_id": 81611,
         #         "invoice_number": "FA-A 00000-00000021",
         #         "invoice_date": "2022-01-01",
