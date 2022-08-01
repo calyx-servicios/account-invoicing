@@ -198,13 +198,13 @@ class AccountExportSircar(models.Model):
                     nro_line = 1
                     for payment in payments:
                         # Campo 01 -- Número de renglón len 5
-                        line = str(nro_line).zfill(5)
+                        line = str(nro_line).zfill(5) + ","
                         
                         # Campo 02 -- Origen del comprobante len 1
-                        line += '1'
+                        line += '1' + ","
                         
                         # Campo 03 -- Tipo de comprobante len 1
-                        line += '1'
+                        line += '1' + ","
                         
                         # Campo 04 -- Numero del comprobante len 12  
                         doc_name = payment.display_name.split(' ')
@@ -214,14 +214,14 @@ class AccountExportSircar(models.Model):
                         else:
                             code_issue = 0
                             
-                        line += str(code_issue).zfill(12)
+                        line += str(code_issue).zfill(12) + ","
                         
                         # Campo 05 -- Cuit contribuyente involucrado en la transacción comercial len 11
-                        line += payment.partner_id.vat.zfill(11)
+                        line += payment.partner_id.vat.zfill(11) + ","
                         
                         # Campo 06 -- Fecha de retencion len 10
                         _date = payment.payment_date.strftime('%d/%m/%Y') #fecha del pago
-                        line += _date
+                        line += _date + ","
                         
                         # Campo 07 -- Monto sujeto a retencion len 12
                         amount = 0.00
@@ -231,7 +231,7 @@ class AccountExportSircar(models.Model):
                         
                         amount_str = '{:.2f}'.format(amount)
                         #amount_str = amount_str.replace('.', ',')
-                        line += amount_str.zfill(12)
+                        line += amount_str.zfill(12) + ","
                         
                         # Campo 08 -- Alicuota len 6
                         amount_alicout = 0
@@ -241,13 +241,13 @@ class AccountExportSircar(models.Model):
                         
                         amount_alicout_str = '{:.2f}'.format(amount_alicout)
                         #amount_alicout_str = amount_alicout_str.replace('.', ',')
-                        line += amount_alicout_str.zfill(6)
+                        line += amount_alicout_str.zfill(6) + ","
                         
                         # Campo 09 -- Monto Retenido len 12
                         amount_total = (amount * amount_alicout) / 100
                         amount_total = '{:.2f}'.format(amount_total)
                         #amount_total = amount_total.replace('.', ',')
-                        line += str(amount_total).zfill(12) 
+                        line += str(amount_total).zfill(12)  + ","
                         
                         # Campo 10 -- Tipo de régimen de retención len 3
                         type_reg_ret = '0'
@@ -255,7 +255,7 @@ class AccountExportSircar(models.Model):
                             if line_alicuot.tag_id.id == jurSIRCAR and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date:
                                 type_reg_ret = line_alicuot.regimen_retencion
                         
-                        line += type_reg_ret.zfill(3)
+                        line += type_reg_ret.zfill(3) + ","
                         
                         # Campo 11 -- Jurisdicción len 3
                         line += tag_tax.jurisdiction_code
@@ -267,13 +267,13 @@ class AccountExportSircar(models.Model):
                     nro_line = 1
                     for payment in payments:
                         # Campo 01 -- Número de renglón len 5
-                        line = str(nro_line).zfill(5)
+                        line = str(nro_line).zfill(5) + ","
                         
                         # Campo 02 -- Origen del comprobante len 1
-                        line += '1'
+                        line += '1' + ","
                         
                         # Campo 03 -- Tipo de comprobante len 1
-                        line += '1'
+                        line += '1' + ","
                         
                         # Campo 04 -- Numero del comprobante len 12  
                         doc_name = payment.display_name.split(' ')
@@ -282,14 +282,14 @@ class AccountExportSircar(models.Model):
                             doc_number = doc_name[1].split('-')
                             code_issue = doc_number[1]
                             
-                        line += str(code_issue).zfill(12)
+                        line += str(code_issue).zfill(12) + ","
                         
                         # Campo 05 -- Cuit contribuyente involucrado en la transacción comercial len 11
-                        line += payment.partner_id.vat.zfill(11)
+                        line += payment.partner_id.vat.zfill(11) + ","
                         
                         # Campo 06 -- Fecha de retencion len 10
                         _date = payment.payment_date.strftime('%d/%m/%Y') #fecha del pago
-                        line += _date
+                        line += _date + ","
                         
                         # Campo 07 -- Monto sujeto a retencion len 12
                         amount = 0.00
@@ -299,7 +299,7 @@ class AccountExportSircar(models.Model):
                         
                         amount_str = '{:.2f}'.format(amount)
                         #amount_str = amount_str.replace('.', ',')
-                        line += amount_str.zfill(12)
+                        line += amount_str.zfill(12) + ","
                         
                         # Campo 08 -- Alicuota len 6
                         amount_alicout = 0
@@ -309,13 +309,13 @@ class AccountExportSircar(models.Model):
                         
                         amount_alicout_str = '{:.2f}'.format(amount_alicout)
                         #amount_alicout_str = amount_alicout_str.replace('.', ',')
-                        line += amount_alicout_str.zfill(6)
+                        line += amount_alicout_str.zfill(6) + ","
                         
                         # Campo 09 -- Monto Retenido len 12
                         amount_total = (amount * amount_alicout) / 100
                         amount_total = '{:.2f}'.format(amount_total)
                         #amount_total = amount_total.replace('.', ',')
-                        line += str(amount_total).zfill(12) 
+                        line += str(amount_total).zfill(12)  + ","
                         
                         # Campo 10 -- Tipo de régimen de retención len 3
                         type_reg_ret = '0'
@@ -323,16 +323,16 @@ class AccountExportSircar(models.Model):
                             if line_alicuot.tag_id.id == jurSIRCAR and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date:
                                 type_reg_ret = line_alicuot.regimen_retencion
                         
-                        line += type_reg_ret.zfill(3)
+                        line += type_reg_ret.zfill(3) + ","
                         
                         # Campo 11 -- Jurisdicción len 3
-                        line += tag_tax.jurisdiction_code
+                        line += tag_tax.jurisdiction_code + ","
                         
                         # Campo 12 -- Tipo de operacion len 1
-                        line += '1'
+                        line += '1' + ","
                         
                         # Campo 13 -- Fecha de emisión de constancia len 10
-                        line += _date
+                        line += _date + ","
                         
                         # Campo 14 -- Número de constancia len 14
                         nro_const = '0'
@@ -340,7 +340,7 @@ class AccountExportSircar(models.Model):
                             if pay_line.payment_method_id.code == 'withholding':
                                 nro_const = pay_line.withholding_number
                         
-                        line += nro_const.zfill(14)
+                        line += nro_const.zfill(14) + ","
                         
                         # Campo 15 -- Número de constancia original len 14
                         line += '0'.zfill(14)
@@ -357,7 +357,7 @@ class AccountExportSircar(models.Model):
                     nro_line = 1
                     for invoice in invoices:
                         # Campo 01 -- Número de renglón len 5
-                        line = str(nro_line).zfill(5)
+                        line = str(nro_line).zfill(5) + ","
                         
                         # Campo 02 -- Tipo de comprobante len 3
                         # Campo 03 -- Letra del comprobante len 1
@@ -372,22 +372,22 @@ class AccountExportSircar(models.Model):
                             code_letter = doc_type[1]
                             code_issue = doc_name[1].replace('-','')[-12:]
                                                     
-                        line += str(code_prefix)
-                        line += str(code_letter)
-                        line += str(code_issue).zfill(12)
+                        line += str(code_prefix) + ","
+                        line += str(code_letter) + ","
+                        line += str(code_issue).zfill(12) + ","
                         
                         # Campo 05 -- Cuit contribuyente involucrado en la transacción comercial len 11
-                        line += invoice.partner_id.vat.zfill(11)
+                        line += invoice.partner_id.vat.zfill(11) + ","
                         
                         # Campo 06 -- Fecha percepcion len 10
                         _date = invoice.invoice_date.strftime('%d/%m/%Y')
-                        line += _date
+                        line += _date + ","
                         
                         # Campo 07 -- Monto sujeto a percepción len 12
                         amount = invoice.amount_untaxed
                         amount_str = '{:.2f}'.format(amount)
                         #amount_str = amount_str.replace('.', ',')
-                        line += str(amount_str).zfill(12)
+                        line += str(amount_str).zfill(12) + ","
                         
                         # Campo 08 -- Alicuota len 6
                         amount_alicout = 0
@@ -397,13 +397,13 @@ class AccountExportSircar(models.Model):
                         
                         amount_alicout_str = '{:.2f}'.format(amount_alicout)
                         #amount_alicout_str = amount_alicout_str.replace('.', ',')
-                        line += str(amount_alicout_str).zfill(6)
+                        line += str(amount_alicout_str).zfill(6) + ","
                         
                         # Campo 09 -- Monto percibido len 12
                         amount_total = (amount * amount_alicout) / 100
                         amount_total = '{:.2f}'.format(amount_total)
                         #amount_total = amount_total.replace('.', ',')
-                        line += str(amount_total).zfill(12)
+                        line += str(amount_total).zfill(12) + ","
 
                         # Campo 10 -- Tipo de régimen de percepcion len 3
                         type_reg_perc = '0'
@@ -411,7 +411,7 @@ class AccountExportSircar(models.Model):
                             if line_alicuot.tag_id.id == jurSIRCAR and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date:
                                 type_reg_perc = line_alicuot.regimen_percepcion
                         
-                        line += type_reg_perc.zfill(3)
+                        line += type_reg_perc.zfill(3) + ","
                         
                         # Campo 11 -- Jurisdicción len 3
                         line += tag_tax.jurisdiction_code
@@ -423,7 +423,7 @@ class AccountExportSircar(models.Model):
                     nro_line = 1
                     for invoice in invoices:
                         # Campo 01 -- Número de renglón len 5
-                        line = str(nro_line).zfill(5)
+                        line = str(nro_line).zfill(5) + ","
                         
                         # Campo 02 -- Tipo de comprobante len 3
                         # Campo 03 -- Letra del comprobante len 1
@@ -438,22 +438,22 @@ class AccountExportSircar(models.Model):
                             code_letter = doc_type[1]
                             code_issue = doc_name[1].replace('-','')[-12:]
                                                     
-                        line += str(code_prefix)
-                        line += str(code_letter)
-                        line += str(code_issue).zfill(12)
+                        line += str(code_prefix) + ","
+                        line += str(code_letter) + ","
+                        line += str(code_issue).zfill(12) + ","
                         
                         # Campo 05 -- Cuit contribuyente involucrado en la transacción comercial len 11
-                        line += invoice.partner_id.vat.zfill(11)
+                        line += invoice.partner_id.vat.zfill(11) + ","
                         
                         # Campo 06 -- Fecha percepcion len 10
                         _date = invoice.invoice_date.strftime('%d/%m/%Y')
-                        line += _date
+                        line += _date + ","
                         
                         # Campo 07 -- Monto sujeto a percepción len 12
                         amount = invoice.amount_untaxed
                         amount_str = '{:.2f}'.format(amount)
                         #amount_str = amount_str.replace('.', ',')
-                        line += str(amount_str).zfill(12)
+                        line += str(amount_str).zfill(12) + ","
                         
                         # Campo 08 -- Alicuota len 6
                         amount_alicout = 0
@@ -463,13 +463,13 @@ class AccountExportSircar(models.Model):
                         
                         amount_alicout_str = '{:.2f}'.format(amount_alicout)
                         #amount_alicout_str = amount_alicout_str.replace('.', ',')
-                        line += str(amount_alicout_str).zfill(6)
+                        line += str(amount_alicout_str).zfill(6) + ","
                         
                         # Campo 09 -- Monto percibido len 12
                         amount_total = (amount * amount_alicout) / 100
                         amount_total = '{:.2f}'.format(amount_total)
                         #amount_total = amount_total.replace('.', ',')
-                        line += str(amount_total).zfill(12)
+                        line += str(amount_total).zfill(12) + ","
 
                         # Campo 10 -- Tipo de régimen de percepcion len 3
                         type_reg_perc = '0'
@@ -477,13 +477,13 @@ class AccountExportSircar(models.Model):
                             if line_alicuot.tag_id.id == jurSIRCAR and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date:
                                 type_reg_perc = line_alicuot.regimen_percepcion
                         
-                        line += type_reg_perc.zfill(3)
+                        line += type_reg_perc.zfill(3) + ","
                         
                         # Campo 11 -- Jurisdicción len 3
-                        line += tag_tax.jurisdiction_code
+                        line += tag_tax.jurisdiction_code + ","
                         
                         # Campo 12 -- Tipo de operacion len 1
-                        line += '1'
+                        line += '1' + ","
                         
                         # Campo 13 -- Número de constancia original len 14
                         line += '0'.zfill(14)
@@ -491,5 +491,6 @@ class AccountExportSircar(models.Model):
                         data.append(line)
                         nro_line += 1
                 
+            data.append('')
             rec.export_sircar_data = '\n'.join(data)
 
