@@ -281,7 +281,10 @@ class AccountExportArba(models.Model):
                     amount = 0
                     for inv_line in invoice.line_ids:
                         if impARBA in inv_line.tag_ids.ids and jurARBA in inv_line.tag_ids.ids:
-                            amount = inv_line.credit
+                            if code_prefix == 'C' or code_prefix == 'H':
+                                amount = inv_line.debit
+                            else:
+                                amount = inv_line.credit
                     
                     # Campo 07 -- Monto imponible len 12
                     # Campo 08 -- Importe de Percepción len 11
