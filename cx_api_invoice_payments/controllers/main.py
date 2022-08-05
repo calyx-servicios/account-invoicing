@@ -59,6 +59,8 @@ def get_invoice_values(data: dict) -> dict:
             or p.id == partner
         )
     )
+    if not partner:
+        return {"error": f"Partner '{data.get('partner')}' not found"}
 
     date = data.get("date")
     if date:
@@ -106,7 +108,9 @@ def get_invoice_values(data: dict) -> dict:
     return values
 
 
-def add_lines_to_invoice(invoice: models.Model, lines: list) -> dict or bool:
+def add_lines_to_invoice(
+    invoice: models.Model, lines: list, company: int
+) -> dict or bool:
     """Adds the lines to the invoice.
 
     * Product: Mandatory (name or id). [product]
@@ -129,15 +133,18 @@ def add_lines_to_invoice(invoice: models.Model, lines: list) -> dict or bool:
     for line in lines:
         product = line.get("product")
         if not product:
-            return {"error": "Missing product"}
+            return {"error": "An Invoice Line is missing the product"}
         product = (
-            request.env["product.product"]
-            .search([])
+            request.env["product.template"]
+            .sudo()
+            .search([("company_id", "in", [company, False])])
             .filtered(
                 lambda p, product=product: p.name.lower() == str(product).lower()
                 or p.id == product
             )
         )
+        if not product:
+            return {"error": f"Product '{line.get('product')}' not found"}
 
         quantity = line.get("quantity")
         if not quantity:
@@ -152,6 +159,7 @@ def add_lines_to_invoice(invoice: models.Model, lines: list) -> dict or bool:
             for tax in taxes:
                 tax_id = (
                     request.env["account.tax"]
+                    .sudo()
                     .search(
                         [
                             ("company_id", "=", invoice.company_id.id),
@@ -367,7 +375,7 @@ class ApiInvoicePaymentsControllers(http.Controller):
 
         lines = kwargs.get("lines")
         if lines:
-            res = add_lines_to_invoice(invoice, lines)
+            res = add_lines_to_invoice(invoice, lines, values.get("company_id"))
             if res.get("error"):
                 return res
         else:
