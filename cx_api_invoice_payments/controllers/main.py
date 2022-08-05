@@ -44,6 +44,8 @@ def get_invoice_values(data: dict) -> dict:
             or c.id == company
         )
     )
+    if not company:
+        return {"error": f"Company '{data.get('company')}' not found"}
 
     partner = data.get("partner")
     if not partner:
