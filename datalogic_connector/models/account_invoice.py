@@ -31,6 +31,15 @@ class AccountInvice(models.Model):
     )
     origin_ref = fields.Char()
     origin_date = fields.Date()
+    file_name = fields.Char("File Name", compute="_compute_name_file", store=True)
+    
+    @api.depends("id")
+    def _compute_name_file(self):
+        for rec in self:
+            if rec.id:
+                rec.file_name = "DGI-" + rec.id + ".pdf"
+            else:
+                rec.file_name = 'DGI-%s-00.pdf' % (rec._name.replace('.', '_'))
 
     def scape_value(self,string):
         original_value = ["º","À","Á","Â","Ã","Ä","Å","Æ","Ç","È","É","Ê","Ë","Ì","Í","Î","Ï",
