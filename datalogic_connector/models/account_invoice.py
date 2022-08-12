@@ -36,7 +36,7 @@ class AccountInvice(models.Model):
     def _compute_name_file(self):
         for rec in self:
             if rec.id:
-                rec.file_name = "DGI-" + rec.id + ".pdf"
+                rec.file_name = "DGI-%s.pdf" % (rec.id)
             else:
                 rec.file_name = 'DGI-%s-00.pdf' % (rec._name.replace('.', '_'))
 
