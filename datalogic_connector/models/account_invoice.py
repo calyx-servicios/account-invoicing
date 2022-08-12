@@ -33,7 +33,6 @@ class AccountInvice(models.Model):
     origin_date = fields.Date()
     file_name = fields.Char("File Name", compute="_compute_name_file", store=True)
     
-    @api.depends("id")
     def _compute_name_file(self):
         for rec in self:
             if rec.id:
