@@ -52,7 +52,6 @@ def get_invoice_values(data: dict) -> dict:
         return {"error": "Missing partner"}
     partner = (
         request.env["res.partner"]
-        .sudo()
         .search([])
         .filtered(
             lambda p: p.vat == str(partner)
@@ -181,7 +180,6 @@ def add_lines_to_invoice(
 
         vat_taxes = (
             request.env["account.tax"]
-            .sudo()
             .browse(tax_ids)
             .filtered(lambda x: x.tax_group_id.l10n_ar_vat_afip_code)
         )
@@ -364,12 +362,7 @@ def post_invoices(invoices: models.Model) -> models.Model:
     Returns:
         models.Model: account.move
     """
-    for invoice in invoices:
-        if invoice.journal_id.dgi_required:
-            invoice.send_dgi()
-        else:
-            invoice.action_post()
-    return invoices
+    invoices.action_post()
 
 class ApiInvoicePaymentsControllers(http.Controller):
     @http.route(
