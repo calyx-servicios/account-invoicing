@@ -52,6 +52,7 @@ def get_invoice_values(data: dict) -> dict:
         return {"error": "Missing partner"}
     partner = (
         request.env["res.partner"]
+        .sudo()
         .search([])
         .filtered(
             lambda p: p.vat == str(partner)
@@ -180,6 +181,7 @@ def add_lines_to_invoice(
 
         vat_taxes = (
             request.env["account.tax"]
+            .sudo()
             .browse(tax_ids)
             .filtered(lambda x: x.tax_group_id.l10n_ar_vat_afip_code)
         )
@@ -353,6 +355,22 @@ def create_and_post_payments(payments: list, invoice: models.Model) -> models.Mo
     return payment_group
 
 
+def post_invoices(invoices: models.Model) -> models.Model:
+    """In case special invoice posting is required or multiple invoices created
+
+    Args:
+        invoices (models.Model): account.move
+
+    Returns:
+        models.Model: account.move
+    """
+    for invoice in invoices:
+        if invoice.journal_id.dgi_required:
+            invoice.send_dgi()
+        else:
+            invoice.action_post()
+    return invoices
+
 class ApiInvoicePaymentsControllers(http.Controller):
     @http.route(
         "/account/create/invoice",
@@ -381,8 +399,8 @@ class ApiInvoicePaymentsControllers(http.Controller):
         else:
             return {"error": "Missing invoice lines"}
 
-        invoice.action_post()
-
+        posted_invoices = post_invoices(invoice)
+        
         res = {
             "result": "Invoice created",
             "invoice_id": invoice.id,
