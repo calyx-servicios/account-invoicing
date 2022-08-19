@@ -353,6 +353,17 @@ def create_and_post_payments(payments: list, invoice: models.Model) -> models.Mo
     return payment_group
 
 
+def post_invoices(invoices: models.Model) -> models.Model:
+    """In case special invoice posting is required or multiple invoices created
+
+    Args:
+        invoices (models.Model): account.move
+
+    Returns:
+        models.Model: account.move
+    """
+    invoices.action_post()
+
 class ApiInvoicePaymentsControllers(http.Controller):
     @http.route(
         "/account/create/invoice",
@@ -381,8 +392,8 @@ class ApiInvoicePaymentsControllers(http.Controller):
         else:
             return {"error": "Missing invoice lines"}
 
-        invoice.action_post()
-
+        posted_invoices = post_invoices(invoice)
+        
         res = {
             "result": "Invoice created",
             "invoice_id": invoice.id,
