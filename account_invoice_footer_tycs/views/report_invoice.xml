@@ -4,10 +4,10 @@
         <div name="footer_left_column" position="replace">
             <div name="footer_left_column" class="col-9 text-left">
                 <div class="row">
-                    <div class="col-2">
+                    <div class="col-3">
                         <img t-if="o.l10n_ar_afip_qr_code" t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('QR', o.l10n_ar_afip_qr_code, 400, 400)" alt="QR Code" style="height:100px;margin-left: 5px"/>
                     </div>  
-                    <div class="col-10">
+                    <div class="col-9">
                         <p t-field="o.narration" style="font-size:10px;line-height: 100%;"/>
                     </div>
                 </div>
