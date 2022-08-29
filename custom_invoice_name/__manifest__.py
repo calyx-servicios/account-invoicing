@@ -31,7 +31,6 @@
     # always loaded
     'data': [
         'views/account_move.xml',
-        'views/account_view_move.xml'
 
     ],
 }
