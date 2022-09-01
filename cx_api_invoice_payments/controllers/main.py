@@ -36,7 +36,7 @@ def get_invoice_values(data: dict) -> dict:
         return {"error": "Company not found"}
     company = (
         request.env["res.company"]
-        .sudo()
+        .with_user(SUPERUSER_ID)
         .search([])
         .filtered(
             lambda c: c.vat == str(company)
@@ -52,6 +52,7 @@ def get_invoice_values(data: dict) -> dict:
         return {"error": "Missing partner"}
     partner = (
         request.env["res.partner"]
+        .with_user(SUPERUSER_ID)
         .search([])
         .filtered(
             lambda p: p.vat == str(partner)
@@ -96,6 +97,7 @@ def get_invoice_values(data: dict) -> dict:
                 return {"error": "Missing document type"}
             document_type = (
                 request.env["l10n_latam.document.type"]
+                .with_user(SUPERUSER_ID)
                 .search([])
                 .filtered(
                     lambda j: j.code == str(document_type)
@@ -136,7 +138,7 @@ def add_lines_to_invoice(
             return {"error": "An Invoice Line is missing the product"}
         product = (
             request.env["product.template"]
-            .sudo()
+            .with_user(SUPERUSER_ID)
             .search([("company_id", "in", [company, False])])
             .filtered(
                 lambda p, product=product: p.name.lower() == str(product).lower()
@@ -159,7 +161,7 @@ def add_lines_to_invoice(
             for tax in taxes:
                 tax_id = (
                     request.env["account.tax"]
-                    .sudo()
+                    .with_user(SUPERUSER_ID)
                     .search(
                         [
                             ("company_id", "=", invoice.company_id.id),
@@ -314,7 +316,11 @@ def create_and_post_payments(payments: list, invoice: models.Model) -> models.Mo
         if not currency:
             currency = invoice.currency_id
         else:
-            currency = request.env["res.currency"].search([("name", "=", currency)])
+            currency = (
+                request.env["res.currency"]
+                .with_user(SUPERUSER_ID)
+                .search([("name", "=", currency)])
+            )
         payments_data.append(
             {
                 "journal": payment_journal.id,
@@ -364,6 +370,7 @@ def post_invoices(invoices: models.Model) -> models.Model:
     """
     invoices.action_post()
 
+
 class ApiInvoicePaymentsControllers(http.Controller):
     @http.route(
         "/account/create/invoice",
@@ -393,7 +400,7 @@ class ApiInvoicePaymentsControllers(http.Controller):
             return {"error": "Missing invoice lines"}
 
         posted_invoices = post_invoices(invoice)
-        
+
         res = {
             "result": "Invoice created",
             "invoice_id": invoice.id,
