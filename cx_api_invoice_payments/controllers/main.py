@@ -132,6 +132,8 @@ def add_lines_to_invoice(
     Returns:
         dict or bool: error message or success.
     """
+    #FIXME: document_type is overwriten when adding lines
+    l10n_latam_document_type_id = invoice.l10n_latam_document_type_id.id
     for line in lines:
         product = line.get("product")
         if not product:
@@ -182,6 +184,7 @@ def add_lines_to_invoice(
 
         vat_taxes = (
             request.env["account.tax"]
+            .sudo()
             .browse(tax_ids)
             .filtered(lambda x: x.tax_group_id.l10n_ar_vat_afip_code)
         )
@@ -202,7 +205,7 @@ def add_lines_to_invoice(
         }
 
         invoice.invoice_line_ids = [(0, 0, line_values)]
-
+    invoice.update({"l10n_latam_document_type_id":l10n_latam_document_type_id})
     return {"success": True}
 
 
