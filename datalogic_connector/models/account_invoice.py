@@ -31,7 +31,7 @@ class AccountInvice(models.Model):
     )
     origin_ref = fields.Char()
     origin_date = fields.Date()
-    file_name = fields.Char("File Name", compute="_compute_name_file", store=True)
+    file_name = fields.Char("File Name", compute="_compute_name_file")
     
     def _compute_name_file(self):
         for rec in self:
