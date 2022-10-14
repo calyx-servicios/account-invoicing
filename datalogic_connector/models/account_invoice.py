@@ -11,26 +11,26 @@ import base64, os
 class AccountInvice(models.Model):
     _inherit = "account.invoice"
 
-    serie_cfe = fields.Char()
-    descargar = fields.Binary()
-    error_dgi = fields.Char()
-    tpo_cfe = fields.Char()
-    description_dgi = fields.Char()
-    hashcfe = fields.Char()
-    FchVenc = fields.Char()
-    nrocae = fields.Char()
-    comprobantecfe = fields.Char()
-    show_estado = fields.Char()
-    estado = fields.Char()
-    txt_send = fields.Text()
-    txt_rquest = fields.Text()
+    serie_cfe = fields.Char(copy=False)
+    descargar = fields.Binary(copy=False)
+    error_dgi = fields.Char(copy=False)
+    tpo_cfe = fields.Char(copy=False)
+    description_dgi = fields.Char(copy=False)
+    hashcfe = fields.Char(copy=False)
+    FchVenc = fields.Char(copy=False)
+    nrocae = fields.Char(copy=False)
+    comprobantecfe = fields.Char(copy=False)
+    show_estado = fields.Char(copy=False)
+    estado = fields.Char(copy=False)
+    txt_send = fields.Text(copy=False)
+    txt_rquest = fields.Text(copy=False)
     display_name = fields.Char(
         compute='_compute_display_name',
         string='Document Reference',
         store=True
     )
-    origin_ref = fields.Char()
-    origin_date = fields.Date()
+    origin_ref = fields.Char(copy=False)
+    origin_date = fields.Date(copy=False)
     file_name = fields.Char("File Name", compute="_compute_name_file")
     
     def _compute_name_file(self):
