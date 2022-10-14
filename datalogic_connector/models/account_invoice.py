@@ -31,7 +31,7 @@ class AccountInvice(models.Model):
     )
     origin_ref = fields.Char(copy=False)
     origin_date = fields.Date(copy=False)
-    file_name = fields.Char("File Name", compute="_compute_name_file", store=True)
+    file_name = fields.Char("File Name", compute="_compute_name_file")
     
     def _compute_name_file(self):
         for rec in self:
@@ -638,7 +638,12 @@ class AccountInvice(models.Model):
             text_node = doc.createTextNode(str(price_unit*line.quantity))
             ItemMon.appendChild(text_node)
             BanLinItem.appendChild(ItemMon)
-            
+
+            ItemDes = doc.createElement("ItemDes")
+            text_node = doc.createTextNode(str(line.name))
+            ItemDes.appendChild(text_node)
+            BanLinItem.appendChild(ItemDes)
+
             line_cont += 1
 # <!-- Tipo de Moneda de la Transacción. Se utiliza codificación según el Estándar  Internacional ISO 4217.[String(3)] -->
         BanTpoMonTra = doc.createElement("BanTpoMonTra")
