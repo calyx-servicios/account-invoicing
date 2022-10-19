@@ -56,12 +56,12 @@ class AccountMove(models.Model):
                 raise ValidationError(
                     _("Vendor bill number must be unique per vendor and company.")
                 )
-    @api.onchange('customer_rank')
+
+    @api.onchange('type')
     def _onchange_partner(self):
-        domain= {'domain':{'partner_id':[('type', 'not in', ('out_invoice', 'out_refund', 'out_receipt'))]}}
-        return domain
-    
-    @api.onchange('supplier_rank')
-    def _onchange_partner(self):
-        domain= {'domain':{'partner_id':[('type', 'not in', ('in_invoice', 'in_refund', 'in_receipt'))]}}
-        return domain
+        customer = {}
+        if self.type not in ('out_invoice', 'out_refund', 'out_receipt'):
+            customer = {'domain':{'partner_id':[('supplier_rank','>', 0)]}}
+        else:
+            customer = {'domain':{'partner_id':[('customer_rank','>', 0)]}}
+        return customer
