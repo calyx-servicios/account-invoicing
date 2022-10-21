@@ -5,7 +5,7 @@
         Invoice name can be customized""",
 
     'author': 'Calyx Servicios S.A., Odoo Community Association (OCA)',
-    'maintainers': ['marcooegg', 'garaceliguzman'],
+    'maintainers': ['marcooegg'],
 
     'website': 'http://odoo.calyx-cloud.com.ar/',
     'license': 'AGPL-3',
@@ -30,7 +30,6 @@
 
     # always loaded
     'data': [
-        'views/account_move.xml',
-
+        'views/account_move.xml'
     ],
 }
