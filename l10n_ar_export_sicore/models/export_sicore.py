@@ -205,39 +205,45 @@ class AccountExportSicore(models.Model):
                         doc_number = doc_name[1].replace('-','')
                     _date = payment.payment_date.strftime('%d/%m/%Y')
                     
-                    line = code_prefix
-                    line += _date
-                    line += str(doc_number).ljust(16)
+                    line = code_prefix[:2]
+                    line += str(_date)[:10]
+                    line += str(doc_number)[:16].zfill(16)
 
                     # Campo 04 -- Importe del comprobante len 16
+                    amount = payment.payments_amount
+                    amount_str = '{:.2f}'.format(amount)
+                    amount_str = str(amount_str).replace('.', ',')
+                    line += amount_str[:16].zfill(16)
+                    
                     # Campo 05 -- Código de impuesto len 4
-                    amount = 0.00
                     code_tax = 0
+                    amount_ret = 0.00
+                    amount_base_ret = 0.00
                     for pay_line in payment.payment_ids:
                         if pay_line.payment_method_id.code == 'withholding':
-                            amount = pay_line.withholding_base_amount
+                            amount_base_ret = pay_line.withholding_base_amount
+                            amount_ret = pay_line.computed_withholding_amount
                             code_tax = pay_line.tax_withholding_id.sicore_tax_code
                     
-                    amount_str = '{:.2f}'.format(amount)
-                    amount_str = amount_str.replace('.', ',')
-                    line += amount_str.zfill(16)
-                    line += str(code_tax).zfill(4)
+                    line += str(code_tax)[:4].zfill(4)
                     
                     # Campo 06 -- Código de régimen len 3
                     if not payment.regimen_ganancias_id:
                         code_reg = '094'
                     else:
                         code_reg = payment.regimen_ganancias_id.display_name
-                    line += str(code_reg).zfill(3)
+                    line += str(code_reg)[:3].zfill(3)
 
                     # Campo 07 -- Código de operación len 1
                     line += '1'.zfill(1)
 
                     # Campo 08 -- Base de Cálculo len 14
-                    line += amount_str.zfill(14)
+                    amount_base_ret_str = '{:.2f}'.format(amount_base_ret)
+                    amount_base_ret_str = str(amount_base_ret_str).replace('.', ',')
+                    line += amount_base_ret_str[:14].zfill(14)
 
                     # Campo 09 -- Fecha de emisión de la retención len 10
-                    line += _date
+                    line += str(_date)[:10]
 
                     # Campo 10 -- Código de condición len 2
                     line += '1'.zfill(2)
@@ -246,38 +252,41 @@ class AccountExportSicore(models.Model):
                     line += '0'.zfill(1)
 
                     # Campo 12 -- Importe de la retencion len 14
-                    line += amount_str.zfill(14)
+                    amount_ret_str = '{:.2f}'.format(amount_ret)
+                    amount_ret_str = str(amount_ret_str).replace('.', ',')
+                    line += amount_ret_str[:14].zfill(14)
 
                     # Campo 13 -- Porcentaje de exclusión len 6
                     amount_excl = '{:.2f}'.format(0)
-                    amount_excl = amount_excl.replace('.', ',')
-                    line += amount_excl.zfill(6)
+                    amount_excl = str(amount_excl).replace('.', ',')
+                    line += amount_excl[:6].zfill(6)
 
                     # Campo 14 -- Fecha publicación o de finalización de la vigencia len 10
                     _date_pub = date.today().strftime('%d/%m/%Y')
-                    line += _date_pub
+                    #line += _date_pub
+                    line += "00/00/0000".zfill(10)
 
                     # Campo 15 -- Tipo de documento del retenido len 2
                     type_doc = payment.partner_id.l10n_latam_identification_type_id.l10n_ar_afip_code
-                    line += type_doc
+                    line += str(type_doc)[:2]
 
                     # Campo 16 -- Número de documento del retenido len 20
-                    line += payment.partner_id.vat.zfill(20)
+                    line += str(payment.partner_id.vat)[:20].zfill(20)
 
                     # Campo 17 -- Número certificado original len 14
                     line += '0'.zfill(14)
                     
                     # Campo 18 -- Denominación del ordenante len 30
-                    line += "".rjust(30)
+                    line += "0".zfill(30)
                     
                     # Campo 19 -- Acrecentamiento len 1
                     line += "0"
                     
                     # Campo 20 -- Cuit del país retenido len 11
-                    line += "".zfill(11)
+                    line += "0".zfill(11)
                     
                     # Campo 21 -- Cuit del ordenante len 11
-                    line += "".zfill(11)
+                    line += str(payment.company_id.vat).replace('-','')[:11].zfill(11)
                     
                     data.append(line)
             else:
@@ -287,11 +296,11 @@ class AccountExportSicore(models.Model):
                 for invoice in invoices:
                     # Campo 01 -- Código de comprobante len 2
                     code = invoice.l10n_latam_document_type_id.code
-                    line = code.zfill(2)
+                    line = str(code)[:2].zfill(2)
 
                     # Campo 02 -- Fecha de emision del comprobante len 10
                     _date = invoice.invoice_date.strftime('%d/%m/%Y')
-                    line += _date
+                    line += str(_date)[:10]
 
                     # Campo 03 -- Numero comprobante len 16
                     doc_number = '0'
@@ -299,13 +308,13 @@ class AccountExportSicore(models.Model):
                     if len(doc_name) > 0:
                         doc_number = doc_name[1].replace('-','')
                     
-                    line += str(doc_number).ljust(16)
+                    line += str(doc_number)[:16].zfill(16)
 
                     # Campo 04 -- Importe del comprobante len 16
                     amount = invoice.amount_untaxed
                     amount_str = '{:.2f}'.format(amount)
-                    amount_str = amount_str.replace('.', ',')
-                    line += str(amount_str).zfill(16)
+                    amount_str = str(amount_str).replace('.', ',')
+                    line += amount_str[:16].zfill(16)
 
                     # Campo 05 -- Código de impuesto len 4
                     code_tax = 0
@@ -315,7 +324,7 @@ class AccountExportSicore(models.Model):
                                 if impSicore in tax_line.tag_ids.ids:
                                     code_tax = tax.sicore_tax_code
                     
-                    line += str(code_tax).zfill(4)
+                    line += str(code_tax)[:4].zfill(4)
 
                     # Campo 06 -- Código de régimen len 3
                     line += '94'.zfill(3)
@@ -324,54 +333,55 @@ class AccountExportSicore(models.Model):
                     line += '2'.zfill(1)
 
                     # Campo 08 -- Base de Cálculo len 14
-                    line += amount_str.zfill(14)
+                    line += amount_str[:14].zfill(14)
 
                     # Campo 09 -- Fecha de emisión de la percepcion len 10
-                    line += _date
+                    line += str(_date)[:10]
 
                     # Campo 10 -- Código de condición len 2
                     code_afip = invoice.partner_id.l10n_ar_afip_responsibility_type_id.code
-                    line += code_afip.zfill(2)
+                    line += str(code_afip)[:2].zfill(2)
 
                     # Campo 11 -- Retención practicada a sujetos suspendidos según: len 1'
                     line += '0'.zfill(1)
 
                     # Campo 12 -- Importe de la retencion len 14
-                    line += amount_str.zfill(14)
+                    line += amount_str[:14].zfill(14)
 
                     # Campo 13 -- Porcentaje de exclusión len 6
                     amount_excl = '{:.2f}'.format(0)
-                    amount_excl = amount_excl.replace('.', ',')
-                    line += amount_excl.zfill(6)
+                    amount_excl = str(amount_excl).replace('.', ',')
+                    line += amount_excl[:6].zfill(6)
 
                     # Campo 14 -- Fecha publicación o de finalización de la vigencia len 10
                     _date_pub = date.today().strftime('%d/%m/%Y')
-                    line += _date_pub
+                    #line += str(_date_pub)[:10]
+                    line += "00/00/0000".zfill(10)
 
                     # Campo 15 -- Tipo de documento del retenido len 2
                     type_doc = invoice.partner_id.l10n_latam_identification_type_id.l10n_ar_afip_code
-                    line += type_doc
+                    line += str(type_doc)[:2]
                     
                     # Campo 16 -- Número de documento del retenido len 20
                     cuit = invoice.partner_id.vat
-                    line += str(cuit).ljust(20)
+                    line += str(cuit)[:20].zfill(20)
 
                     # Campo 17 -- Número certificado original len 14
                     line += '0'.zfill(14)
                     
                     # Campo 18 -- Denominación del ordenante len 30
-                    line += "".rjust(30)
+                    line += "0".zfill(30)
                     
                     # Campo 19 -- Acrecentamiento len 1
                     line += "0"
                     
                     # Campo 20 -- Cuit del país retenido len 11
-                    line += "".zfill(11)
+                    line += "0".zfill(11)
                     
                     # Campo 21 -- Cuit del ordenante len 11
-                    line += "".zfill(11)
+                    line += str(invoice.company_id.vat).replace('-','')[:11].zfill(11)
                     
                     data.append(line)
             
-            rec.export_sicore_data = '\n'.join(data)
+            rec.export_sicore_data = '\r\n'.join(data)
 
