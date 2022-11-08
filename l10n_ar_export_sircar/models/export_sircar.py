@@ -182,7 +182,11 @@ class AccountExportSircar(models.Model):
                                 per += inv
                             
         return per
-
+    
+    def convert_currency(self, amount, rate, currency, round=True):
+        to_amount = amount * rate
+        return currency.round(to_amount) if round else to_amount
+    
     def compute_sircar_data(self):
         line = ''
         account_tag_obj = self.env['account.account.tag']
@@ -230,13 +234,6 @@ class AccountExportSircar(models.Model):
                         for pay_line in payment.payment_ids:
                             if pay_line.payment_method_id.code == 'withholding':
                                 amount = pay_line.withholding_base_amount
-                                if pay_line.currency_id.id != pay_line.company_id.currency_id.id:
-                                    amount = pay_line.currency_id._convert(
-                                        amount,
-                                        pay_line.company_id.currency_id,
-                                        pay_line.company_id,
-                                        date.today()
-                                    )
                         
                         amount_str = '{:.2f}'.format(amount)
                         #amount_str = amount_str.replace('.', ',')
@@ -307,13 +304,6 @@ class AccountExportSircar(models.Model):
                         for pay_line in payment.payment_ids:
                             if pay_line.payment_method_id.code == 'withholding':
                                 amount = pay_line.withholding_base_amount
-                                if pay_line.currency_id.id != pay_line.company_id.currency_id.id:
-                                    amount = pay_line.currency_id._convert(
-                                        amount,
-                                        pay_line.company_id.currency_id,
-                                        pay_line.company_id,
-                                        date.today()
-                                    )
                         
                         amount_str = '{:.2f}'.format(amount)
                         #amount_str = amount_str.replace('.', ',')
@@ -405,11 +395,10 @@ class AccountExportSircar(models.Model):
                         
                         # Campo 07 -- Monto sujeto a percepción len 12
                         if invoice.currency_id.id != invoice.company_id.currency_id.id:
-                            amount = invoice.currency_id._convert(
+                            amount = self.convert_currency(
                                 invoice.amount_untaxed,
-                                invoice.company_id.currency_id,
-                                invoice.company_id,
-                                date.today()
+                                invoice.computed_currency_rate,
+                                invoice.company_id.currency_id
                             )
                         else:
                             amount = invoice.amount_untaxed
@@ -481,11 +470,10 @@ class AccountExportSircar(models.Model):
                         
                         # Campo 07 -- Monto sujeto a percepción len 12
                         if invoice.currency_id.id != invoice.company_id.currency_id.id:
-                            amount = invoice.currency_id._convert(
+                            amount = self.convert_currency(
                                 invoice.amount_untaxed,
-                                invoice.company_id.currency_id,
-                                invoice.company_id,
-                                date.today()
+                                invoice.computed_currency_rate,
+                                invoice.company_id.currency_id
                             )
                         else:
                             amount = invoice.amount_untaxed
