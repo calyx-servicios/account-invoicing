@@ -155,7 +155,8 @@ class AccountExportSircar(models.Model):
                 if line.payment_method_id.code == 'withholding':
                     for tax_line in line.tax_withholding_id.invoice_repartition_line_ids:
                         if retSIRCAR in tax_line.tag_ids.ids and jurSIRCAR in tax_line.tag_ids.ids:
-                            ret += pay
+                            if not pay in ret:
+                                ret += pay
         
         return ret
 
@@ -177,7 +178,8 @@ class AccountExportSircar(models.Model):
                 for tax in line.tax_ids:
                     for tax_line in tax.invoice_repartition_line_ids:
                         if percSIRCAR in tax_line.tag_ids.ids and jurSIRCAR in tax_line.tag_ids.ids:
-                            per += inv
+                            if not inv in per:
+                                per += inv
                             
         return per
 
@@ -228,6 +230,13 @@ class AccountExportSircar(models.Model):
                         for pay_line in payment.payment_ids:
                             if pay_line.payment_method_id.code == 'withholding':
                                 amount = pay_line.withholding_base_amount
+                                if pay_line.currency_id.id != pay_line.company_id.currency_id.id:
+                                    amount = pay_line.currency_id._convert(
+                                        amount,
+                                        pay_line.company_id.currency_id,
+                                        pay_line.company_id,
+                                        date.today()
+                                    )
                         
                         amount_str = '{:.2f}'.format(amount)
                         #amount_str = amount_str.replace('.', ',')
@@ -244,8 +253,10 @@ class AccountExportSircar(models.Model):
                         line += amount_alicout_str.zfill(6) + ","
                         
                         # Campo 09 -- Monto Retenido len 12
+                        currency = payment.company_id.currency_id
                         amount_total = (amount * amount_alicout) / 100
-                        amount_total = '{:.2f}'.format(amount_total)
+                        amount_total_round = currency.round(amount_total)
+                        amount_total = '{:.2f}'.format(amount_total_round)
                         #amount_total = amount_total.replace('.', ',')
                         line += str(amount_total).zfill(12)  + ","
                         
@@ -296,6 +307,13 @@ class AccountExportSircar(models.Model):
                         for pay_line in payment.payment_ids:
                             if pay_line.payment_method_id.code == 'withholding':
                                 amount = pay_line.withholding_base_amount
+                                if pay_line.currency_id.id != pay_line.company_id.currency_id.id:
+                                    amount = pay_line.currency_id._convert(
+                                        amount,
+                                        pay_line.company_id.currency_id,
+                                        pay_line.company_id,
+                                        date.today()
+                                    )
                         
                         amount_str = '{:.2f}'.format(amount)
                         #amount_str = amount_str.replace('.', ',')
@@ -312,8 +330,10 @@ class AccountExportSircar(models.Model):
                         line += amount_alicout_str.zfill(6) + ","
                         
                         # Campo 09 -- Monto Retenido len 12
+                        currency = payment.company_id.currency_id
                         amount_total = (amount * amount_alicout) / 100
-                        amount_total = '{:.2f}'.format(amount_total)
+                        amount_total_round = currency.round(amount_total)
+                        amount_total = '{:.2f}'.format(amount_total_round)
                         #amount_total = amount_total.replace('.', ',')
                         line += str(amount_total).zfill(12)  + ","
                         
@@ -384,7 +404,15 @@ class AccountExportSircar(models.Model):
                         line += _date + ","
                         
                         # Campo 07 -- Monto sujeto a percepción len 12
-                        amount = invoice.amount_untaxed
+                        if invoice.currency_id.id != invoice.company_id.currency_id.id:
+                            amount = invoice.currency_id._convert(
+                                invoice.amount_untaxed,
+                                invoice.company_id.currency_id,
+                                invoice.company_id,
+                                date.today()
+                            )
+                        else:
+                            amount = invoice.amount_untaxed
                         amount_str = '{:.2f}'.format(amount)
                         #amount_str = amount_str.replace('.', ',')
                         line += str(amount_str).zfill(12) + ","
@@ -400,8 +428,10 @@ class AccountExportSircar(models.Model):
                         line += str(amount_alicout_str).zfill(6) + ","
                         
                         # Campo 09 -- Monto percibido len 12
+                        currency = invoice.company_id.currency_id
                         amount_total = (amount * amount_alicout) / 100
-                        amount_total = '{:.2f}'.format(amount_total)
+                        amount_total_round = currency.round(amount_total)
+                        amount_total = '{:.2f}'.format(amount_total_round)
                         #amount_total = amount_total.replace('.', ',')
                         line += str(amount_total).zfill(12) + ","
 
@@ -450,7 +480,15 @@ class AccountExportSircar(models.Model):
                         line += _date + ","
                         
                         # Campo 07 -- Monto sujeto a percepción len 12
-                        amount = invoice.amount_untaxed
+                        if invoice.currency_id.id != invoice.company_id.currency_id.id:
+                            amount = invoice.currency_id._convert(
+                                invoice.amount_untaxed,
+                                invoice.company_id.currency_id,
+                                invoice.company_id,
+                                date.today()
+                            )
+                        else:
+                            amount = invoice.amount_untaxed
                         amount_str = '{:.2f}'.format(amount)
                         #amount_str = amount_str.replace('.', ',')
                         line += str(amount_str).zfill(12) + ","
@@ -466,8 +504,10 @@ class AccountExportSircar(models.Model):
                         line += str(amount_alicout_str).zfill(6) + ","
                         
                         # Campo 09 -- Monto percibido len 12
+                        currency = invoice.company_id.currency_id
                         amount_total = (amount * amount_alicout) / 100
-                        amount_total = '{:.2f}'.format(amount_total)
+                        amount_total_round = currency.round(amount_total)
+                        amount_total = '{:.2f}'.format(amount_total_round)
                         #amount_total = amount_total.replace('.', ',')
                         line += str(amount_total).zfill(12) + ","
 
