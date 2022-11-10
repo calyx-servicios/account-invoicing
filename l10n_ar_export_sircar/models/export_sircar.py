@@ -2,8 +2,8 @@
 from odoo import api, fields, models, _
 from odoo.tools import date_utils
 from odoo.exceptions import UserError
-from datetime import date, timedelta
-import base64
+from datetime import date, timedelta, datetime
+import base64, calendar
 
 WITHHOLDING = '1'
 PERCEPTION = '2'
@@ -71,6 +71,8 @@ class AccountExportSircar(models.Model):
         compute="_compute_files",
         readonly=True,
     )
+    
+    company_id = fields.Many2one('res.company')
 
     def name_get(self):
         res = []
@@ -103,12 +105,10 @@ class AccountExportSircar(models.Model):
         for rec in self:
             month = rec.month
             year = int(rec.year)
-
-            _ds = fields.Date.to_date('%s-%.2d-01' % (year, month))
-            _de = date_utils.end_of(_ds, 'month')
-
-            rec.date_from = _ds
-            rec.date_to = _de
+            
+            rec.date_from = datetime(year, month, 1)
+            last_day = calendar.monthrange(year, month)[1]
+            rec.date_to = datetime(year, month, last_day)
 
     @api.depends('export_sircar_data')
     def _compute_files(self):
@@ -146,7 +146,8 @@ class AccountExportSircar(models.Model):
         payments = payment_obj.search([
             ('payment_date', '>=', self.date_from),
             ('payment_date', '<=', self.date_to),
-            ('state', '=', 'posted')
+            ('state', '=', 'posted'),
+            ('company_id', '=', self.company_id.id)
         ])
         
         ret = payment_obj      
@@ -168,8 +169,9 @@ class AccountExportSircar(models.Model):
         invoices = invoice_obj.search([
             ('invoice_date', '>=', self.date_from),
             ('invoice_date', '<=', self.date_to),
-            ('type', '=', 'out_invoice'),
-            ('state', '=', 'posted')
+            ('type', 'in', ['out_invoice','out_refund']),
+            ('state', '=', 'posted'),
+            ('company_id', '=', self.company_id.id)
         ])
         
         per = invoice_obj      
