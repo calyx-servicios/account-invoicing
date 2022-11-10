@@ -30,7 +30,7 @@ class AccountExportSicore(models.Model):
         [('0', 'Monthly'),
          ('1', 'First'),
          ('2', 'Second')],
-        default=0
+        default='0'
     )
     doc_type = fields.Selection(
         [
@@ -63,6 +63,8 @@ class AccountExportSicore(models.Model):
         compute="_compute_files",
         readonly=True,
     )
+    
+    company_id = fields.Many2one('res.company')
 
     def name_get(self):
         res = []
@@ -100,15 +102,16 @@ class AccountExportSicore(models.Model):
             month = rec.month
             year = int(rec.year)
 
-            _ds = fields.Date.to_date('%s-%.2d-01' % (year, month))
-            _de = date_utils.end_of(_ds, 'month')
-
             if rec.fortnight == '1':
                 _ds = datetime(year, month, 1)
-                _de = datetime(year, rec.month, 15)
-            if rec.fortnight == '2':
+                _de = datetime(year, month, 15)
+            elif rec.fortnight == '2':
                 _ds = datetime(year, month, 16)
-                last_day = calendar.monthrange(year, rec.month)[1]
+                last_day = calendar.monthrange(year, month)[1]
+                _de = datetime(year, month, last_day)
+            else:
+                _ds = datetime(year, month, 1)
+                last_day = calendar.monthrange(year, month)[1]
                 _de = datetime(year, month, last_day)
 
             rec.date_from = _ds
@@ -145,7 +148,8 @@ class AccountExportSicore(models.Model):
         payments = payment_obj.search([
             ('payment_date', '>=', self.date_from),
             ('payment_date', '<=', self.date_to),
-            ('state', '=', 'posted')
+            ('state', '=', 'posted'),
+            ('company_id', '=', self.company_id.id)
         ])
         
         ret = payment_obj      
@@ -154,7 +158,8 @@ class AccountExportSicore(models.Model):
                 if line.payment_method_id.code == 'withholding':
                     for tax_line in line.tax_withholding_id.invoice_repartition_line_ids:
                         if imp_ret in tax_line.tag_ids.ids:
-                            ret += pay
+                            if not pay in ret:
+                                ret += pay
         
         return ret
 
@@ -168,7 +173,8 @@ class AccountExportSicore(models.Model):
             ('invoice_date', '>=', self.date_from),
             ('invoice_date', '<=', self.date_to),
             ('type', 'in', ['out_invoice','out_refund']),
-            ('state', '=', 'posted')
+            ('state', '=', 'posted'),
+            ('company_id', '=', self.company_id.id)
         ])
         
         per = invoice_obj      
@@ -177,7 +183,8 @@ class AccountExportSicore(models.Model):
                 for tax in line.tax_ids:
                     for tax_line in tax.invoice_repartition_line_ids:
                         if imp_perc in tax_line.tag_ids.ids:
-                            per += inv
+                            if not inv in per:
+                                per += inv
                             
         return per
 
@@ -221,9 +228,11 @@ class AccountExportSicore(models.Model):
                     amount_base_ret = 0.00
                     for pay_line in payment.payment_ids:
                         if pay_line.payment_method_id.code == 'withholding':
-                            amount_base_ret = pay_line.withholding_base_amount
-                            amount_ret = pay_line.computed_withholding_amount
-                            code_tax = pay_line.tax_withholding_id.sicore_tax_code
+                            for tax_line in pay_line.tax_withholding_id.invoice_repartition_line_ids:
+                                if impSicore in tax_line.tag_ids.ids:
+                                    amount_base_ret = pay_line.withholding_base_amount
+                                    amount_ret = pay_line.computed_withholding_amount
+                                    code_tax = pay_line.tax_withholding_id.sicore_tax_code
                     
                     line += str(code_tax)[:4].zfill(4)
                     
