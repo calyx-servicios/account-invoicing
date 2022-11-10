@@ -13,6 +13,7 @@
 	                    <group>
 	                        <field name="doc_type" widget="radio"/>
 	                        <field name="tag_tax"/>
+	                        <field name="company_id" options="{'no_create': True, 'no_create_edit':True}"/>
 	                    </group>
 	                    <group>
 	                        <field name="year" style="width: 30%" />
@@ -41,6 +42,7 @@
 	    <field name="arch" type="xml">
 	        <tree>
 	            <field name="export_sircar_filename"/>
+	            <field name="company_id"/>
 	            <field name="date_from"/>
 	            <field name="date_to"/>
 	            <field name="doc_type"/>
