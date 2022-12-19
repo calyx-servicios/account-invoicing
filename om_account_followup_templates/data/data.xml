@@ -42,6 +42,7 @@
           ]]></field>
         </record>
 
+
         <record id="email_template_om_account_followup_level_fiscal_notes_pg" model="mail.template">
           <field name="name">Vencidas</field>
           <field name="email_from">${(user.email or '')|safe}</field>
