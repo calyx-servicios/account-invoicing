@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import api, fields, models, _
-import logging
-_logger = logging.getLogger(__name__)
+from odoo import models
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
