@@ -492,7 +492,7 @@ class AccountInvice(models.Model):
         if self.partner_id.country_id.code:
                 if self.partner_id.country_id.code == "MX":
                         BanCiuRec = doc.createElement("BanCiuRec")
-                        text_node = doc.createTextNode(str(self.partner_id.city_id.name))
+                        text_node = doc.createTextNode(str(self.partner_id.city.name))
                         BanCiuRec.appendChild(text_node)
                         Bandeja.appendChild(BanCiuRec)
                 else:
