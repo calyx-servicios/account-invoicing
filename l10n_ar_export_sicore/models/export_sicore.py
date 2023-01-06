@@ -65,6 +65,8 @@ class AccountExportSicore(models.Model):
     )
     
     company_id = fields.Many2one('res.company')
+    
+    final_line_break = fields.Boolean('Final line break?', default=False)
 
     def name_get(self):
         res = []
@@ -392,5 +394,9 @@ class AccountExportSicore(models.Model):
                     
                     data.append(line)
             
-            rec.export_sicore_data = '\r\n'.join(data)
+            if not rec.final_line_break:
+                rec.export_sicore_data = '\r\n'.join(data)
+            else:
+                for line in data:
+                    rec.export_sicore_data += line + '\r\n'
 
