@@ -180,3 +180,9 @@ msgstr "Año"
 #: model:ir.model.fields,help:l10n_ar_export_sicore.field_account_export_sicore__year
 msgid "Year of the period"
 msgstr "Año del periódo"
+
+#. module: l10n_ar_export_sicore
+#: code:addons/l10n_ar_export_sicore/models/export_sicore.py:0
+#, python-format
+msgid "You have not configured the CUIT for this company"
+msgstr "No tienes configurado el CUIT para esta empresa"
