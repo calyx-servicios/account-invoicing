@@ -196,6 +196,7 @@ class AccountExportSicore(models.Model):
         sicore_imp = self.env.ref("l10n_ar_ux.tag_ret_perc_sicore_aplicada")
         impSicore = account_tag_obj.search([('id', '=', sicore_imp.id)]).id
         for rec in self:
+            rec.export_sicore_data = ""
             if rec.doc_type == WITHHOLDING:
                 # Retenciones
                 payments = self.get_withholding_payments(impSicore)
