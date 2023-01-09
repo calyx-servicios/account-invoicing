@@ -65,6 +65,8 @@ class AccountExportSicore(models.Model):
     )
     
     company_id = fields.Many2one('res.company')
+    
+    final_line_break = fields.Boolean('Final line break?', default=False)
 
     def name_get(self):
         res = []
@@ -194,6 +196,7 @@ class AccountExportSicore(models.Model):
         sicore_imp = self.env.ref("l10n_ar_ux.tag_ret_perc_sicore_aplicada")
         impSicore = account_tag_obj.search([('id', '=', sicore_imp.id)]).id
         for rec in self:
+            rec.export_sicore_data = ""
             if rec.doc_type == WITHHOLDING:
                 # Retenciones
                 payments = self.get_withholding_payments(impSicore)
@@ -392,5 +395,9 @@ class AccountExportSicore(models.Model):
                     
                     data.append(line)
             
-            rec.export_sicore_data = '\r\n'.join(data)
+            if not rec.final_line_break:
+                rec.export_sicore_data = '\r\n'.join(data)
+            else:
+                for line in data:
+                    rec.export_sicore_data += line + '\r\n'
 
