@@ -1,0 +1,17 @@
+<odoo>
+
+    <record id="account_invoice_tree" model="ir.ui.view">
+        <field name="model">account.invoice</field>
+        <field name="name">account.invoice.tree</field>
+        <field name="inherit_id" ref="account.invoice_supplier_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='analytic_tag_ids']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//field[@name='account_id']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
