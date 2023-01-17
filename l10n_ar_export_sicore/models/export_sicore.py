@@ -174,7 +174,7 @@ class AccountExportSicore(models.Model):
         invoices = invoice_obj.search([
             ('invoice_date', '>=', self.date_from),
             ('invoice_date', '<=', self.date_to),
-            ('type', 'in', ['out_invoice','out_refund']),
+            ('move_type', 'in', ['out_invoice','out_refund']),
             ('state', '=', 'posted'),
             ('company_id', '=', self.company_id.id)
         ])
