@@ -5,11 +5,9 @@
         <field name="name">account.invoice.form</field>
         <field name="inherit_id" ref="account.invoice_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='analytic_tag_ids']" position="attributes">
-                <attribute name="optional">hide</attribute>
-            </xpath>
-            <xpath expr="//field[@name='account_id']" position="attributes">
-                <attribute name="optional">hide</attribute>
+            <xpath expr="//field[@name='account_analytic_id']" position="attributes">
+                <attribute name="required">False</attribute>
+                <attribute name="invisible">1</attribute>
             </xpath>
         </field>
     </record>
