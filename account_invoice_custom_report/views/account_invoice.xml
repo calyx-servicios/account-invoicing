@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_account_invoice_form_agreement" model="ir.ui.view">
+        <field name="name">account.invoice.view.form.inherit</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='cash_rounding_id']" position="before">
+                <field name="agreement" attrs="{'invisible': [('type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="l10n_ar_aeroo_einvoice.action_aeroo_report_ar_einvoice" model="ir.actions.report">
+        <field name="report_file">account_invoice_custom_report/static/src/xml/einvoice_with_footer_mod_qr.odt</field>
+    </record>
+</odoo>
