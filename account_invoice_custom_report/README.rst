@@ -15,9 +15,9 @@ Account Invoice Custom Report
 .. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
-.. |badge3| image:: https://img.shields.io/badge/github-calyx--servicios%2Fstock-lightgray.png?logo=github
-    :target: https://github.com/calyx-servicios/stock
-    :alt: calyx-servicios/stock.git
+.. |badge3| image:: https://img.shields.io/badge/github-calyx--servicios%2Faccount--invoicing-lightgray.png?logo=github
+    :target: https://github.com/calyx-servicios/account-invoicing
+    :alt: calyx-servicios/account-invoicing.git
 
 |badge1| |badge2| |badge3|
 
