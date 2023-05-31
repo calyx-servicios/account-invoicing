@@ -2,7 +2,7 @@ from odoo import api, fields, models, _
 from odoo.tools import date_utils
 from odoo.exceptions import UserError, ValidationError
 from datetime import date, timedelta, datetime
-import base64, calendar, logging
+import base64, calendar
 
 _logger = logging.getLogger(__name__)
 
@@ -181,7 +181,6 @@ class AccountExportArciba(models.Model):
         return per
 
     def compute_arciba_data(self):
-        _logger.info('#### Starting method (compute_arciba_data) ####')
         for record in self:
             data = []
             if record.doc_type == 'perc/with':
