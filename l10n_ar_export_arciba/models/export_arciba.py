@@ -4,7 +4,6 @@ from odoo.exceptions import UserError, ValidationError
 from datetime import date, timedelta, datetime
 import base64, calendar
 
-_logger = logging.getLogger(__name__)
 
 WITHHOLDING = '1'
 PERCEPTION = '2'
