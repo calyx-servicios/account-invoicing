@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+    	<record model="account.payment.method.line" id="earnings_withholding_calculation.payment_method_line_out_withholding">
+			<field name="payment_method_id" ref="account_withholding.account_payment_method_out_withholding"/>
+			<field name="name">Retención</field>
+		</record>
+		<record model="account.payment.method.line" id="earnings_withholding_calculation.payment_method_line_in_withholding">
+			<field name="payment_method_id" ref="account_withholding.account_payment_method_in_withholding"/>
+			<field name="name">Retención</field>
+		</record>
+		<record model="account.journal" id="earnings_withholding">
+			<field name="name">Retenciones de Ganancias</field>
+			<field name="type">cash</field>
+			<field name="code">ESW1</field>
+			<field name="outbound_payment_method_line_ids" eval="[(4, ref('earnings_withholding_calculation.payment_method_line_out_withholding'))]"/>
+			<field name="inbound_payment_method_line_ids" eval="[(4, ref('earnings_withholding_calculation.payment_method_line_in_withholding'))]"/>
+		</record>
+    </data>
+</odoo>
