@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+		<record model="account.tax" id="tax_earnings_withholding">
+			<field name="name">Impuesto Retenciones de Ganancias</field>
+			<field name="type_tax_use">supplier</field>
+			<field name="withholding_type">tabla_ganancias</field>
+			<field name="withholding_accumulated_payments">month</field>
+			<field name="withholding_amount_type">untaxed_amount</field>
+			<field name="withholding_non_taxable_minimum">600</field>
+		</record>
+    </data>
+</odoo>

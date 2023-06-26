@@ -98,9 +98,6 @@ class AccountExportSicore(models.Model):
         and last day of the period
         """
         for rec in self:
-            if rec.doc_type == WITHHOLDING:
-                rec.fortnight = '0'
-
             month = rec.month
             year = int(rec.year)
 
