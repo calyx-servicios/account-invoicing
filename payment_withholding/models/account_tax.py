@@ -33,6 +33,8 @@ class AccountTax(models.Model):
                             withholding_totals[tax_withholding_id] += withholding_amount
                         else:
                             withholding_totals[tax_withholding_id] = withholding_amount
+            else:
+                return super(AccountTax, self).create_payment_withholdings(payment_group)
 
         for tax_withholding_id, amount in withholding_totals.items():
             payment_withholding = self.env['account.payment'].search([
