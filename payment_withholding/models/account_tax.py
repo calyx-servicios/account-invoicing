@@ -27,6 +27,7 @@ class AccountTax(models.Model):
                     raise ValidationError(_('There can be only one record with the custom identifier {} for the same company.'.format(record.custom_identifier)))
 
     def create_payment_withholdings(self, payment_group):
+        payments = False
         moves_m = payment_group.to_pay_move_line_ids.filtered(
             lambda x: x.move_id.l10n_latam_document_type_id.doc_code_prefix in [
                 'FA-M',
@@ -35,8 +36,10 @@ class AccountTax(models.Model):
             ]
         )
         if moves_m:
-            self.create_withholding_type_m(payment_group)
-            return True
+            payments = self.create_withholding_type_m(payment_group)
+
+        if payments:
+            return payments
         else:
             return super(AccountTax, self).create_payment_withholdings(payment_group)
 
@@ -55,7 +58,7 @@ class AccountTax(models.Model):
                 for tax in income_taxes:
                     withholding_amount = (
                         move.move_id.amount_untaxed
-                        * tax.amount
+                        * 0.06
                     )
 
                     if withholding_amount:
@@ -67,7 +70,7 @@ class AccountTax(models.Model):
                 for tax in vat_taxes:
                     withholding_amount = (
                         move.move_id.amount_tax
-                        * tax.amount
+                        * 1.0
                     )
 
                     if withholding_amount:
@@ -115,6 +118,8 @@ class AccountTax(models.Model):
                     'partner_id': payment_group.partner_id.id,
                 }
                 self.env['account.payment'].create(vals)
+
+        return True
 
     def _get_taxes_for_payment_group(self, company_id):
         income_taxes = self.search([
