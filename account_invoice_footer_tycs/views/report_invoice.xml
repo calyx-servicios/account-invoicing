@@ -8,7 +8,7 @@
                         <img t-if="o.l10n_ar_afip_qr_code" t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('QR', o.l10n_ar_afip_qr_code, 400, 400)" alt="QR Code" style="height:100px;margin-left: 5px"/>
                     </div>  
                     <div class="col-9">
-                        <p t-field="o.narration" style="font-size:10px;line-height: 100%;"/>
+                        <p t-field="o.narration" style="font-size:10px;line-height: 100%;text-align: center;margin-left: 3em;"/>
                     </div>
                 </div>
             </div>

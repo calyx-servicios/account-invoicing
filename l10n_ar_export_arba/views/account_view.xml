@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+	<record id="view_account_export_arba_form" model="ir.ui.view">
+	    <field name="name">account.export.arba.form</field>
+	    <field name="model">account.export.arba</field>
+	    <field name="arch" type="xml">
+	        <form>
+	            <header>
+	                <button name="compute_arba_data" string="Regenerate ARBA" type="object"/>
+	            </header>
+	            <sheet>
+	                <group>
+	                    <group>
+	                        <field name="doc_type" widget="radio"/>
+	                    </group>
+	                    <group>
+	                        <field name="year" style="width: 30%" />
+	                        <field name="month" style="width: 30%" />
+	                        <field name="fortnight"/>
+	                    </group>
+	                </group>
+	                <group colspan="4">
+	                    <span> Days of period
+	                        <field name="date_from"/> <span> - </span> <field name="date_to"/>
+	                    </span>
+	                </group>
+	
+	                <group string="File and data">
+	                    <field name="export_arba_filename" invisible="1"/>
+	                    <field name="export_arba_file" readonly="1" filename="export_arba_filename"/>
+	                    <field name="export_arba_data"/>
+	                </group>
+	            </sheet>
+	        </form>
+	    </field>
+	</record>
+	
+	<record id="view_account_export_arba" model="ir.ui.view">
+	    <field name="name">account.export.arba.tree</field>
+	    <field name="model">account.export.arba</field>
+	    <field name="arch" type="xml">
+	        <tree>
+	            <field name="export_arba_filename"/>
+	            <field name="date_from"/>
+	            <field name="date_to"/>
+	            <field name="doc_type"/>
+	            <field name="period"/>
+	            <field name="fortnight"/>
+	        </tree>
+	    </field>
+	</record>
+	
+	<record id="action_account_export_arba" model="ir.actions.act_window">
+	    <field name="name">Export ARBA</field>
+	    <field name="res_model">account.export.arba</field>
+	    <field name="view_mode">tree,form</field>
+	</record>
+	
+	<menuitem id="menu_account_export_arba"
+	          action="action_account_export_arba"
+	          parent="l10n_ar.account_reports_ar_statements_menu"
+	          sequence="6"/>
+
+</odoo>
