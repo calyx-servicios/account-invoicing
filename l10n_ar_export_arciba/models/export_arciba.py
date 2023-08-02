@@ -63,7 +63,7 @@ class AccountExportArciba(models.Model):
         compute="_compute_files",
         readonly=True,
     )
-    
+
     company_id = fields.Many2one('res.company')
 
     def name_get(self):
@@ -80,9 +80,9 @@ class AccountExportArciba(models.Model):
 
     def _get_default_tag_tax(self):
         jusdiriction = self.env.ref('l10n_ar_ux.tag_tax_jurisdiccion_901')
-        if jusdiriction:
+        if not jusdiriction:
             raise ValidationError(_('The jurisdiction for CABA has not been found'))
-        return jusdiriction            
+        return jusdiriction
 
     def _default_year(self):
         return self._last_month().year
@@ -132,8 +132,8 @@ class AccountExportArciba(models.Model):
                 rec.export_arciba_file = False
 
     def get_withholding_payments(self, imp_ret):
-        """ 
-        Obtains the supplier payments that are withholdings and 
+        """
+        Obtains the supplier payments that are withholdings and
         that are in the selected period
         """
         payment_obj = self.env['account.payment.group'].sudo()
@@ -143,8 +143,8 @@ class AccountExportArciba(models.Model):
             ('state', '=', 'posted'),
             ('company_id', '=', self.company_id.id)
         ])
-        
-        ret = payment_obj      
+
+        ret = payment_obj
         for pay in payments:
             for line in pay.payment_ids:
                 if line.payment_method_id.code == 'withholding':
@@ -152,12 +152,12 @@ class AccountExportArciba(models.Model):
                         if imp_ret in tax_line.tag_ids.ids:
                             if not pay in ret:
                                 ret += pay
-        
+
         return ret
 
     def get_perception_invoices(self, imp_perc, type):
-        """ 
-        Gets the customer invoices that have perceptions 
+        """
+        Gets the customer invoices that have perceptions
         and that are in the selected period.
         """
         invoice_obj = self.env['account.move'].sudo()
@@ -176,7 +176,7 @@ class AccountExportArciba(models.Model):
                     for tax_line in tax.invoice_repartition_line_ids:
                         if imp_perc in tax_line.tag_ids.ids:
                             if not inv in per:
-                                per += inv         
+                                per += inv
         return per
 
     def compute_arciba_data(self):
@@ -246,9 +246,12 @@ class AccountExportArciba(models.Model):
                     }.get(payment.partner_id.l10n_ar_gross_income_type, '5')
                     line += income_type
                     # 13 - Nro Inscripcion IB len(11)
-                    income_type_number = payment.partner_id.l10n_ar_gross_income_number[:11].zfill(11)
-                    if income_type == 'exempt':
+                    if income_type in ['local', 'multilateral'] and not payment.partner_id.l10n_ar_gross_income_number:
+                        raise UserError(_('The partner {} does not have gross income configured in Contacts -> Fiscal data'))
+                    if income_type not in ['local', 'multilateral']:
                         income_type_number = ''.zfill(11)
+                    else:
+                        income_type_number = payment.partner_id.l10n_ar_gross_income_number[:11].zfill(11)
                     line += income_type_number
                     # 14 - Situacion Frente al IVA len(1)
                     responsibility_type = {
@@ -299,7 +302,7 @@ class AccountExportArciba(models.Model):
                     }.get(invoice.l10n_latam_document_type_id.internal_type, '09')
                     if voucher_type == 'invoice':
                         if invoice.l10n_latam_document_type_id.doc_code_prefix == 'FCE-A':
-                            voucher_type = '10' 
+                            voucher_type = '10'
                     line += voucher_type
                     # 05 - Letra del comprobante len(1)
                     line += ' '
@@ -417,7 +420,7 @@ class AccountExportArciba(models.Model):
                         }.get(invoice.l10n_latam_document_type_id.internal_type, '09')
                         if voucher_type == 'invoice':
                             if invoice.l10n_latam_document_type_id.doc_code_prefix == 'FCE-A':
-                                voucher_type = '10' 
+                                voucher_type = '10'
                         line += voucher_type
                         #07 - Letra del comprobante len(1)
                         line += ' '
