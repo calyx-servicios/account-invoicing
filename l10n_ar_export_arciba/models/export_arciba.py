@@ -246,9 +246,12 @@ class AccountExportArciba(models.Model):
                     }.get(payment.partner_id.l10n_ar_gross_income_type, '5')
                     line += income_type
                     # 13 - Nro Inscripcion IB len(11)
-                    income_type_number = payment.partner_id.l10n_ar_gross_income_number[:11].zfill(11)
-                    if income_type == 'exempt':
+                    if income_type in ['local', 'multilateral'] and not payment.partner_id.l10n_ar_gross_income_number:
+                        raise UserError(_('The partner {} does not have gross income configured in Contacts -> Fiscal data'))
+                    if income_type not in ['local', 'multilateral']:
                         income_type_number = ''.zfill(11)
+                    else:
+                        income_type_number = payment.partner_id.l10n_ar_gross_income_number[:11].zfill(11)
                     line += income_type_number
                     # 14 - Situacion Frente al IVA len(1)
                     responsibility_type = {
