@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="payment_withholding.view_tax_form_inherit" model="ir.ui.view">
+        <field name="name">account.tax.inherit.view.form</field>
+        <field name="model">account.tax</field>
+        <field name="inherit_id" ref="account.view_tax_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='advanced_options']/group/group[1]/field[@name='tax_group_id']" position="after">
+                <field name="custom_identifier" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

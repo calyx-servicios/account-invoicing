@@ -8,7 +8,7 @@
     "website": "https://odoo.calyx-cloud.com.ar/",
     "license": "AGPL-3",
     "category": "Purchase",
-    "version": "15.0.1.2.0",
+    "version": "15.0.2.1.0",
     "development_status": "Production/Stable",
     "application": False,
     "installable": True,
@@ -18,5 +18,6 @@
     ],
     "data": [
         'data/tax_withholding.xml',
+        'views/account_tax.xml',
     ],
 }
