@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-18 12:08+0000\n"
-"PO-Revision-Date: 2023-05-18 12:08+0000\n"
+"POT-Creation-Date: 2023-07-21 16:30+0000\n"
+"PO-Revision-Date: 2023-07-21 16:30+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,12 +16,51 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: payment_withholding
+#: model:ir.model.fields,field_description:payment_withholding.field_account_tax__custom_identifier
+msgid "Custom Identifier"
+msgstr "Identificador personalizado"
+
+#. module: payment_withholding
+#: code:addons/payment_withholding/models/account_tax.py:0
+#: model:ir.model.fields.selection,name:payment_withholding.selection__account_tax__custom_identifier__income_tax
+#, python-format
+msgid "Income Tax Withholding"
+msgstr "Retención de ganancias"
+
+#. module: payment_withholding
 #: code:addons/payment_withholding/models/account_tax.py:0
 #, python-format
 msgid "No journal for withholdings found on company %s"
-msgstr "No se encontró ningún diario para el registro de retenciones en la empresa %s"
+msgstr "No se encontró ningun diario de retenciones en la empresa %s"
 
 #. module: payment_withholding
 #: model:ir.model,name:payment_withholding.model_account_tax
 msgid "Tax"
 msgstr "Impuesto"
+
+#. module: payment_withholding
+#: code:addons/payment_withholding/models/account_tax.py:0
+#, python-format
+msgid ""
+"There can be only one record with the custom identifier {} for the same "
+"company."
+msgstr ""
+"Solo puede haber un registro con el identificador personalizado {} para el mismo "
+"compañía."
+
+#. module: payment_withholding
+#: code:addons/payment_withholding/models/account_tax.py:0
+#: model:ir.model.fields.selection,name:payment_withholding.selection__account_tax__custom_identifier__vat_withholding
+#, python-format
+msgid "VAT Withholding"
+msgstr "Retención de IVA"
+
+#. module: payment_withholding
+#: code:addons/payment_withholding/models/account_tax.py:0
+#, python-format
+msgid ""
+"Income Tax or VAT Withholding not found for the company. Please make sure "
+"you have set up the appropriate taxes."
+msgstr ""
+"No se encontró la retención de Impuesto a las Ganancias (Retención de ganancias) o la retención de IVA (Retención de IVA) para la empresa. "
+"Por favor, asegúrate de configurar los impuestos correspondientes."
