@@ -217,18 +217,25 @@ class AccountExportArciba(models.Model):
                     # 08 - Monto del comprobante len(16)(2decimales)
                     amount_ret = 0
                     amount_base_ret = 0
+                    number_retention = False
+                    payment_line = False
                     for pay_line in payment.payment_ids:
                         if pay_line.payment_method_id.code == 'withholding':
                             for tax_line in pay_line.tax_withholding_id.invoice_repartition_line_ids:
                                 if self.tag_tax.id in tax_line.tag_ids.ids:
+                                    payment_line = pay_line
                                     amount_base_ret = pay_line.withholding_base_amount
+                                    number_retention = pay_line.withholding_number
                                     amount_ret = pay_line.computed_withholding_amount
 
                     amount_ret_str = '{:.2f}'.format(amount_ret).replace('.', ',')
                     line += amount_ret_str[:16].zfill(16)
 
                     # 09 - Numero de Certificado Propio len(16)
-                    line += doc_number
+                    if number_retention:
+                        line += str(number_retention[:16].zfill(16))
+                    else:
+                        raise (_('The withholding number was not found in the {} payment within the {} payment group'.format(payment_line.name, payment.name)))
                     # 10 - Tipo del documento len(1)
                     identification_type = {
                         'CUIT': '3',
@@ -271,18 +278,19 @@ class AccountExportArciba(models.Model):
                     amount_base_ret_str = '{:.2f}'.format(amount_base_ret).replace('.', ',')
                     line += amount_base_ret_str[:16].zfill(16)
                     # 19 - Alicuota len(5)(2decimales)
-                    alicuot = payment.partner_id.arba_alicuot_ids.filtered(lambda line: line.from_date == record.date_from and line.to_date == record.date_to)
+                    alicuot = payment.partner_id.arba_alicuot_ids.filtered(lambda line: line.from_date == record.date_from and line.to_date == record.date_to and line.company_id.id == record.company_id.id)
                     alicuota_ret_str = '{:.2f}'.format(alicuot.alicuota_retencion) if alicuot else '0,00'
                     alicuota_ret_str = alicuota_ret_str.replace('.', ',')
                     line += alicuota_ret_str[:5].zfill(5) if alicuot else '00,00'
                     # 20 - Retencion practicada len(16)(2decimales)
-                    line += alicuota_ret_str[:16].zfill(16)
+                    line += amount_ret_str[:16].zfill(16)
                     # 21 - Monto Total recibido len(16)
-                    line += alicuota_ret_str[:16].zfill(16)
+                    line += amount_ret_str[:16].zfill(16)
                     # 22 - Aceptacion len(1)
                     line += ' '
                     # 23 - Fecha Aceptacion len(10)
                     line += ' '.ljust(10)
+                    line += '\r\n'
                     print(len(line))
                     data.append(line)
                 #Percepciones
@@ -378,7 +386,7 @@ class AccountExportArciba(models.Model):
                     amount_untaxed_str = '{:.2f}'.format(invoice.amount_untaxed).replace('.', ',')
                     line += amount_untaxed_str[:14].zfill(16)
                     # 19 - Alicuota len(5)(2decimales)
-                    alicuot = invoice.partner_id.arba_alicuot_ids.filtered(lambda line: line.from_date == record.date_from and line.to_date == record.date_to)
+                    alicuot = invoice.partner_id.arba_alicuot_ids.filtered(lambda line: line.from_date == record.date_from and line.to_date == record.date_to and line.company_id.id == record.company_id.id)
                     alicuota_ret_str = '{:.2f}'.format(alicuot.alicuota_retencion) if alicuot else '0,00'
                     alicuota_ret_str = alicuota_ret_str.replace('.', ',')
                     line += alicuota_ret_str[:5].zfill(5) if alicuot else '00,00'
@@ -390,6 +398,7 @@ class AccountExportArciba(models.Model):
                     line += ' '
                     # 23 - Fecha Aceptacion len(10)
                     line += ' '.ljust(10)
+                    line += '\r\n'
                     data.append(line)
             else:
                 line = ''
@@ -449,13 +458,14 @@ class AccountExportArciba(models.Model):
                         amount_perceptions_str = str(amount_perceptions_str).replace('.', ',')
                         line += amount_perceptions_str[:16].zfill(16)
                         #13 - Alicuota len(5)(2decimales)
-                        alicuot = invoice.partner_id.arba_alicuot_ids.filtered(lambda line: line.from_date == record.date_from and line.to_date == record.date_to)
+                        alicuot = invoice.partner_id.arba_alicuot_ids.filtered(lambda line: line.from_date == record.date_from and line.to_date == record.date_to and line.company_id.id == record.company_id.id)
                         alicuota_ret_str = '{:.2f}'.format(alicuot.alicuota_retencion) if alicuot else '0,00'
                         alicuota_ret_str = alicuota_ret_str.replace('.', ',')
                         line += alicuota_ret_str[:5].zfill(5) if alicuot else '00,00'
+                        line += '\r\n'
                         data.append(line)
             if data:
-                record.export_arciba_data = '\r\n'.join(data)
+                record.export_arciba_data = ''.join(data)
 
     def _get_tax_amount(self, tax, amount_untaxed):
         amount_tax = 0
