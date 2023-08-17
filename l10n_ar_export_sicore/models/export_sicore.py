@@ -284,7 +284,7 @@ class AccountExportSicore(models.Model):
                     line += str(payment.partner_id.vat)[:20].zfill(20)
 
                     # Campo 17 -- Número certificado original len 14
-                    line += payment.name.replace('-','').zfill(14)
+                    line += payment.document_number.split('-')[1].zfill(14)
                     
                     
                     data.append(line)
@@ -366,7 +366,7 @@ class AccountExportSicore(models.Model):
                     line += str(cuit)[:20].zfill(20)
 
                     # Campo 17 -- Número certificado original len 14
-                    line += invoice.name.replace('-','').zfill(14)
+                    line += str(invoice.sequence_number).zfill(14)
                     
                     data.append(line)
             
