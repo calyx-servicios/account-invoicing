@@ -247,7 +247,7 @@ class AccountExportArciba(models.Model):
                     line += income_type
                     # 13 - Nro Inscripcion IB len(11)
                     if income_type in ['local', 'multilateral'] and not payment.partner_id.l10n_ar_gross_income_number:
-                        raise UserError(_('The partner {} does not have gross income configured in Contacts -> Fiscal data'))
+                        raise UserError(_('The partner {} does not have gross income configured in Contacts -> Fiscal data'.format(payment.partner_id.name)))
                     if income_type not in ['local', 'multilateral']:
                         income_type_number = ''.zfill(11)
                     else:
