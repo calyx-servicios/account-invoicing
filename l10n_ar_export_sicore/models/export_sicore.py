@@ -266,14 +266,15 @@ class AccountExportSicore(models.Model):
                     line += amount_ret_str[:14].zfill(14)
 
                     # Campo 13 -- Porcentaje de exclusión len 6
-                    amount_excl = '{:.2f}'.format(0)
-                    amount_excl = str(amount_excl).replace('.', ',')
-                    line += amount_excl[:6].zfill(6)
-
+                    # amount_excl = '{:.2f}'.format(0)
+                    # amount_excl = str(amount_excl).replace('.', ',')
+                    # line += amount_excl[:6].zfill(6)
+                    line += '0'.zfill(6)
+                    
                     # Campo 14 -- Fecha publicación o de finalización de la vigencia len 10
-                    _date_pub = date.today().strftime('%d/%m/%Y')
-                    #line += _date_pub
-                    line += "00/00/0000".zfill(10)
+                    _date_pub = payment.payment_date.strftime('%d/%m/%Y')
+                    line += _date_pub
+                    # line += "00/00/0000".zfill(10)
 
                     # Campo 15 -- Tipo de documento del retenido len 2
                     type_doc = payment.partner_id.l10n_latam_identification_type_id.l10n_ar_afip_code
@@ -283,19 +284,8 @@ class AccountExportSicore(models.Model):
                     line += str(payment.partner_id.vat)[:20].zfill(20)
 
                     # Campo 17 -- Número certificado original len 14
-                    line += '0'.zfill(14)
+                    line += payment.name.replace('-','').zfill(14)
                     
-                    # Campo 18 -- Denominación del ordenante len 30
-                    line += "0".zfill(30)
-                    
-                    # Campo 19 -- Acrecentamiento len 1
-                    line += "0"
-                    
-                    # Campo 20 -- Cuit del país retenido len 11
-                    line += "0".zfill(11)
-                    
-                    # Campo 21 -- Cuit del ordenante len 11
-                    line += str(payment.company_id.vat).replace('-','')[:11].zfill(11)
                     
                     data.append(line)
             else:
@@ -358,14 +348,14 @@ class AccountExportSicore(models.Model):
                     line += amount_str[:14].zfill(14)
 
                     # Campo 13 -- Porcentaje de exclusión len 6
-                    amount_excl = '{:.2f}'.format(0)
-                    amount_excl = str(amount_excl).replace('.', ',')
-                    line += amount_excl[:6].zfill(6)
-
+                    # amount_excl = '{:.2f}'.format(0)
+                    # amount_excl = str(amount_excl).replace('.', ',')
+                    # line += amount_excl[:6].zfill(6)
+                    line += '0'.zfill(6)
                     # Campo 14 -- Fecha publicación o de finalización de la vigencia len 10
-                    _date_pub = date.today().strftime('%d/%m/%Y')
-                    #line += str(_date_pub)[:10]
-                    line += "00/00/0000".zfill(10)
+                    _date_pub = invoice.invoice_date.strftime('%d/%m/%Y')
+                    line += str(_date_pub)[:10]
+                    # line += "00/00/0000".zfill(10)
 
                     # Campo 15 -- Tipo de documento del retenido len 2
                     type_doc = invoice.partner_id.l10n_latam_identification_type_id.l10n_ar_afip_code
@@ -376,19 +366,7 @@ class AccountExportSicore(models.Model):
                     line += str(cuit)[:20].zfill(20)
 
                     # Campo 17 -- Número certificado original len 14
-                    line += '0'.zfill(14)
-                    
-                    # Campo 18 -- Denominación del ordenante len 30
-                    line += "0".zfill(30)
-                    
-                    # Campo 19 -- Acrecentamiento len 1
-                    line += "0"
-                    
-                    # Campo 20 -- Cuit del país retenido len 11
-                    line += "0".zfill(11)
-                    
-                    # Campo 21 -- Cuit del ordenante len 11
-                    line += str(invoice.company_id.vat).replace('-','')[:11].zfill(11)
+                    line += invoice.name.replace('-','').zfill(14)
                     
                     data.append(line)
             
