@@ -1,0 +1,18 @@
+<odoo>
+    <data>
+        <record id="income_tax_withholding" model="account.tax">
+            <field name="name">Income Tax Withholding</field>
+            <field name="amount_type">percent</field>
+            <field name="amount">6</field>
+            <field name="type_tax_use">supplier</field>
+            <field name="custom_identifier">income_tax</field>
+        </record>
+        <record id="vat_withholding" model="account.tax">
+            <field name="name">VAT Withholding</field>
+            <field name="amount_type">percent</field>
+            <field name="amount">100</field>
+            <field name="type_tax_use">supplier</field>
+            <field name="custom_identifier">vat_withholding</field>
+        </record>
+    </data>
+</odoo>
