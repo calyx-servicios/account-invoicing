@@ -1,10 +1,16 @@
+<<<<<<< HEAD
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError, UserError
+=======
+from odoo import models, _
+from odoo.exceptions import UserError
+>>>>>>> 23028915e7cf767a2f22bedfcf92db992b71140f
 
 
 class AccountTax(models.Model):
     _inherit = "account.tax"
 
+<<<<<<< HEAD
     _CUSTOM_IDENTIFIER_SELECTION = [
         ('income_tax', _('Income Tax Withholding')),
         ('vat_withholding', _('VAT Withholding')),
@@ -90,17 +96,39 @@ class AccountTax(models.Model):
                 payment_withholding.write({'amount': amount})
             else:
                 move = payment_group.to_pay_move_line_ids[0].move_id
+=======
+    def create_payment_withholdings(self, payment_group):
+        withholding_config = [
+            {
+                'tax_withholding_id': self.env.ref('payment_withholding.income_tax_withholding').id,
+                'field_name': 'amount_untaxed',
+                'withholding_rate': 0.06,
+            },
+            {
+                'tax_withholding_id': self.env.ref('payment_withholding.vat_withholding').id,
+                'field_name': 'amount_tax',
+                'withholding_rate': 1.0,
+            },
+        ]
+        for move in payment_group.to_pay_move_line_ids:
+            if move.move_id.l10n_latam_document_type_id.doc_code_prefix in ['FA-M', 'ND-M', 'NC-M']:
+>>>>>>> 23028915e7cf767a2f22bedfcf92db992b71140f
                 payment_method = self.env.ref(
                     'account_withholding.'
                     'account_payment_method_out_withholding')
                 journal = self.env['account.journal'].search([
+<<<<<<< HEAD
                     ('company_id', '=', move.company_id.id),
+=======
+                    ('company_id', '=', move.move_id.company_id.id),
+>>>>>>> 23028915e7cf767a2f22bedfcf92db992b71140f
                     ('outbound_payment_method_ids', '=', payment_method.id),
                     ('type', 'in', ['cash', 'bank']),
                 ], limit=1)
                 if not journal:
                     raise UserError(_('No journal for withholdings found on company %s') % move.move_id.company_id.name)
 
+<<<<<<< HEAD
                 if not journal:
                     raise UserError(
                         _('No journal for withholdings found on company %s')
@@ -141,3 +169,39 @@ class AccountTax(models.Model):
             raise UserError(_('Income Tax or VAT Withholding not found for the company. Please make sure you have set up the appropriate taxes.'))
 
         return income_taxes, vat_taxes
+=======
+                for config in withholding_config:
+                    withholding_amount = move.move_id[config['field_name']] * config['withholding_rate']
+
+                    payment_withholding = self.env['account.payment'].search([
+                        ('payment_group_id', '=', payment_group.id),
+                        ('tax_withholding_id', '=', config['tax_withholding_id']),
+                        ('automatic', '=', True),
+                    ], limit=1)
+
+                    if withholding_amount:
+                        if payment_withholding:
+                            payment_withholding.write({
+                                'amount': withholding_amount,
+                            })
+                        else:
+                            payment_method_line_id = journal.outbound_payment_method_ids.filtered(
+                                lambda x: x.code == 'withholding').mapped('id')[0]
+
+                            vals = {
+                                'payment_group_id': payment_group.id,
+                                'tax_withholding_id': config['tax_withholding_id'],
+                                'automatic': True,
+                                'amount': withholding_amount,
+                                'journal_id': journal.id,
+                                'payment_method_id': payment_method_line_id,
+                                'payment_type': 'outbound',
+                                'partner_type': payment_group.partner_type,
+                                'partner_id': payment_group.partner_id.id,
+                            }
+                            self.env['account.payment'].create(vals)
+            else:
+                super().create_payment_withholdings(payment_group)
+
+        return True
+>>>>>>> 23028915e7cf767a2f22bedfcf92db992b71140f
