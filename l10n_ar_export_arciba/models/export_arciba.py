@@ -63,7 +63,8 @@ class AccountExportArciba(models.Model):
         compute="_compute_files",
         readonly=True,
     )
-
+    failed_invoice_ids = fields.Many2many('account.move', string='Invoice Failed')
+    failed_payment_ids = fields.Many2many('account.payment.group', string='Payment Failed')
     company_id = fields.Many2one('res.company')
 
     def name_get(self):
@@ -209,7 +210,11 @@ class AccountExportArciba(models.Model):
                     doc_number = '0'
                     doc_name = payment.document_number
                     if len(doc_name) > 0:
-                        doc_number = doc_name.replace('-','')
+                        try:
+                            doc_number = doc_name[1].replace('-','')
+                        except:
+                            record.failed_payment_ids = [(4,payment.id)]
+                            continue
 
                     line += str(doc_number)[:16].zfill(16)
                     # 07 - Fecha del comprobante len(10)
@@ -227,7 +232,9 @@ class AccountExportArciba(models.Model):
                                     amount_base_ret = pay_line.withholding_base_amount
                                     number_retention = pay_line.withholding_number
                                     amount_ret = pay_line.computed_withholding_amount
+                                    payment_amount = pay_line.amount
 
+                    payment_amount_str = '{:.2f}'.format(payment_amount).replace('.', ',')
                     amount_ret_str = '{:.2f}'.format(amount_ret).replace('.', ',')
                     line += amount_ret_str[:16].zfill(16)
 
@@ -279,13 +286,15 @@ class AccountExportArciba(models.Model):
                     line += amount_base_ret_str[:16].zfill(16)
                     # 19 - Alicuota len(5)(2decimales)
                     alicuot = payment.partner_id.arba_alicuot_ids.filtered(lambda line: line.from_date == record.date_from and line.to_date == record.date_to and line.company_id.id == record.company_id.id)
+                    if len(alicuot) > 1:
+                        raise UserError(_('The partner: {} has more than one alicuot for the same period and company. Please keep only one alicuot for the same period {} and company {}').format(payment.partner_id.name, record.period, record.company_id.name))
                     alicuota_ret_str = '{:.2f}'.format(alicuot.alicuota_retencion) if alicuot else '0,00'
                     alicuota_ret_str = alicuota_ret_str.replace('.', ',')
                     line += alicuota_ret_str[:5].zfill(5) if alicuot else '00,00'
                     # 20 - Retencion practicada len(16)(2decimales)
-                    line += amount_ret_str[:16].zfill(16)
+                    line += payment_amount_str[:16].zfill(16)
                     # 21 - Monto Total recibido len(16)
-                    line += amount_ret_str[:16].zfill(16)
+                    line += payment_amount_str[:16].zfill(16)
                     # 22 - Aceptacion len(1)
                     line += ' '
                     # 23 - Fecha Aceptacion len(10)
@@ -318,7 +327,11 @@ class AccountExportArciba(models.Model):
                     doc_number = '0'
                     doc_name = invoice.name.split(' ')
                     if len(doc_name) > 0:
-                        doc_number = doc_name[1].replace('-','')
+                        try:
+                            doc_number = doc_name[1].replace('-','')
+                        except:
+                            record.failed_invoice_ids = [(4,invoice.id)]
+                            continue
 
                     line += str(doc_number)[:16].zfill(16)
                     # 07 - Fecha del comprobante len(10)
@@ -387,6 +400,8 @@ class AccountExportArciba(models.Model):
                     line += amount_untaxed_str[:14].zfill(16)
                     # 19 - Alicuota len(5)(2decimales)
                     alicuot = invoice.partner_id.arba_alicuot_ids.filtered(lambda line: line.from_date == record.date_from and line.to_date == record.date_to and line.company_id.id == record.company_id.id)
+                    if len(alicuot) > 1:
+                        raise UserError(_('The partner: {} has more than one alicuot for the same period and company. Please keep only one alicuot for the same period {} and company {}').format(invoice.partner_id.name, record.period, record.company_id.name))
                     alicuota_ret_str = '{:.2f}'.format(alicuot.alicuota_retencion) if alicuot else '0,00'
                     alicuota_ret_str = alicuota_ret_str.replace('.', ',')
                     line += alicuota_ret_str[:5].zfill(5) if alicuot else '00,00'
@@ -437,7 +452,11 @@ class AccountExportArciba(models.Model):
                         doc_number_name = '0'
                         doc_name_number = invoice.name.split(' ')
                         if len(doc_name_number) > 0:
-                            doc_number_name = doc_name_number[1].replace('-','')
+                            try:
+                                doc_number_name = doc_name_number[1].replace('-','')
+                            except:
+                                record.failed_invoice_ids = [(4,invoice.id)]
+                                continue
                         line += str(doc_number_name)[:16].zfill(16)
                         #09 - Nro de documento len(11)
                         line += invoice.partner_id.vat[:11].zfill(11)
@@ -459,6 +478,8 @@ class AccountExportArciba(models.Model):
                         line += amount_perceptions_str[:16].zfill(16)
                         #13 - Alicuota len(5)(2decimales)
                         alicuot = invoice.partner_id.arba_alicuot_ids.filtered(lambda line: line.from_date == record.date_from and line.to_date == record.date_to and line.company_id.id == record.company_id.id)
+                        if len(alicuot) > 1:
+                            raise UserError(_('The partner: {} has more than one alicuot for the same period and company. Please keep only one alicuot for the same period {} and company {}').format(invoice.partner_id.name, record.period, record.company_id.name))
                         alicuota_ret_str = '{:.2f}'.format(alicuot.alicuota_retencion) if alicuot else '0,00'
                         alicuota_ret_str = alicuota_ret_str.replace('.', ',')
                         line += alicuota_ret_str[:5].zfill(5) if alicuot else '00,00'
