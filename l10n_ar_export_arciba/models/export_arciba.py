@@ -184,128 +184,140 @@ class AccountExportArciba(models.Model):
         for record in self:
             data = []
             if record.doc_type == 'perc/with':
-                # Retenciones
                 payments = self.get_withholding_payments(record.tag_tax.id)
-                line = ''
+
                 for payment in payments:
-                    # 01 - Tipo de operacion len(1)
-                    line += WITHHOLDING
-                    # 02 - Codigo de norma len(3)
-                    line += STANDARD_CODE
-                    # 03 - Fecha de Retencion len(10)
-                    _date = payment.payment_date.strftime('%d/%m/%Y')
-                    line += str(_date)[:10]
-                    # 04 - Tipo de comprobante Origen len(2)
-                    voucher_type = {
-                        'invoice': '01',
-                        'debit_note': '02',
-                        'supplier_payment': '03',
-                        'customer_payment': '04',
-                        'receipt_invoice': '07'
-                    }.get(payment.document_type_id.internal_type, '09')
-                    line += voucher_type
-                    # 05 - Letra del comprobante len(1)
-                    line += ' '
-                    # 06 - Nro del comprobante len(16)
-                    doc_number = '0'
-                    doc_name = payment.document_number
-                    if len(doc_name) > 0:
-                        try:
-                            doc_number = doc_name[1].replace('-','')
-                        except:
-                            record.failed_payment_ids = [(4,payment.id)]
-                            continue
+                    payment_withholdings = payment.payment_ids.filtered(lambda x: x.payment_method_id.code == 'withholding')
+                    if not payment_withholdings:
+                        continue
+                    for pay_line in payment_withholdings:
+                        for tax_line in pay_line.tax_withholding_id.invoice_repartition_line_ids:
+                            if not self.tag_tax.id in tax_line.tag_ids.ids:
+                                continue
+                            amount_ret = pay_line.computed_withholding_amount
+                            amount_base_ret = pay_line.withholding_base_amount
+                            number_retention = pay_line.withholding_number
+                            payment_amount = pay_line.amount
 
-                    line += str(doc_number)[:16].zfill(16)
-                    # 07 - Fecha del comprobante len(10)
-                    line += str(_date)[:10]
-                    # 08 - Monto del comprobante len(16)(2decimales)
-                    amount_ret = 0
-                    amount_base_ret = 0
-                    number_retention = False
-                    payment_line = False
-                    for pay_line in payment.payment_ids:
-                        if pay_line.payment_method_id.code == 'withholding':
-                            for tax_line in pay_line.tax_withholding_id.invoice_repartition_line_ids:
-                                if self.tag_tax.id in tax_line.tag_ids.ids:
-                                    payment_line = pay_line
-                                    amount_base_ret = pay_line.withholding_base_amount
-                                    number_retention = pay_line.withholding_number
-                                    amount_ret = pay_line.computed_withholding_amount
-                                    payment_amount = pay_line.amount
+                            line = ''
+                            # 01 - Tipo de operacion len(1)
+                            line += WITHHOLDING
+                            # 02 - Codigo de norma len(3)
+                            line += STANDARD_CODE
+                            # 03 - Fecha de Retencion len(10)
+                            _date = payment.payment_date.strftime('%d/%m/%Y')
+                            line += str(_date)[:10]
+                            # 04 - Tipo de comprobante Origen len(2)
+                            voucher_type = {
+                                'invoice': '01',
+                                'debit_note': '02',
+                                'supplier_payment': '03',
+                                'customer_payment': '04',
+                                'receipt_invoice': '07'
+                            }.get(payment.document_type_id.internal_type, '09')
+                            line += voucher_type
+                            # 05 - Letra del comprobante len(1)
+                            line += ' '
+                            # 06 - Nro del comprobante len(16)
+                            doc_number = '0'
+                            doc_name = payment.display_name.split(' ')
+                            if len(doc_name) > 0:
+                                try:
+                                    doc_number = doc_name[1].replace('-','')
+                                except:
+                                    record.failed_payment_ids = [(4,payment.id)]
+                                    continue
 
-                    payment_amount_str = '{:.2f}'.format(payment_amount).replace('.', ',')
-                    amount_ret_str = '{:.2f}'.format(amount_ret).replace('.', ',')
-                    line += amount_ret_str[:16].zfill(16)
+                            line += str(doc_number)[:16].zfill(16)
+                            # 07 - Fecha del comprobante len(10)
+                            line += str(_date)[:10]
+                            # 08 - Monto del comprobante len(16)(2decimales)
+                            payment_amount_str = '{:.2f}'.format(payment_amount).replace('.', ',')
+                            amount_ret_str = '{:.2f}'.format(amount_ret).replace('.', ',')
+                            line += amount_ret_str[:16].zfill(16)
 
-                    # 09 - Numero de Certificado Propio len(16)
-                    if number_retention:
-                        line += str(number_retention[:16].zfill(16))
-                    else:
-                        raise (_('The withholding number was not found in the {} payment within the {} payment group'.format(payment_line.name, payment.name)))
-                    # 10 - Tipo del documento len(1)
-                    identification_type = {
-                        'CUIT': '3',
-                        'CUIL': '2',
-                        'CDI': '1'
-                    }.get(payment.partner_id.l10n_latam_identification_type_id.name, ' ')
-                    line += identification_type
-                    # 11 - Numero de documento len(11)
-                    line += payment.partner_id.vat[:11].zfill(11)
-                    # 12 - Situacion IB len(1)
-                    income_type = {
-                        'local': '1',
-                        'multilateral': '2',
-                        'exempt': '4'
-                    }.get(payment.partner_id.l10n_ar_gross_income_type, '5')
-                    line += income_type
-                    # 13 - Nro Inscripcion IB len(11)
-                    if income_type in ['local', 'multilateral'] and not payment.partner_id.l10n_ar_gross_income_number:
-                        raise UserError(_('The partner {} does not have gross income configured in Contacts -> Fiscal data'.format(payment.partner_id.name)))
-                    if income_type not in ['local', 'multilateral']:
-                        income_type_number = ''.zfill(11)
-                    else:
-                        income_type_number = payment.partner_id.l10n_ar_gross_income_number[:11].zfill(11)
-                    line += income_type_number
-                    # 14 - Situacion Frente al IVA len(1)
-                    responsibility_type = {
-                        'IVA Responsable Inscripto': 1,
-                        'IVA Sujeto Exento': 3,
-                        'Responsable Monotributo': 4
-                    }.get(payment.partner_id.l10n_ar_afip_responsibility_type_id.name, 0)
-                    line += str(responsibility_type)
-                    # 15 - Razon Social len(30)
-                    partner_name = payment.partner_id.name[:30].ljust(30)
-                    line += partner_name
-                    # 16 - Importe otros conceptos len(16)(2decimales)
-                    line += '0,00'.zfill(16)
-                    # 17 - Importe IVA len(16)
-                    line += '0,00'.zfill(16)
-                    # 18 - Monto Sujeto a retencion len(16)(2decimales)
-                    amount_base_ret_str = '{:.2f}'.format(amount_base_ret).replace('.', ',')
-                    line += amount_base_ret_str[:16].zfill(16)
-                    # 19 - Alicuota len(5)(2decimales)
-                    alicuot = payment.partner_id.arba_alicuot_ids.filtered(lambda line: line.from_date == record.date_from and line.to_date == record.date_to and line.company_id.id == record.company_id.id)
-                    if len(alicuot) > 1:
-                        raise UserError(_('The partner: {} has more than one alicuot for the same period and company. Please keep only one alicuot for the same period {} and company {}').format(payment.partner_id.name, record.period, record.company_id.name))
-                    alicuota_ret_str = '{:.2f}'.format(alicuot.alicuota_retencion) if alicuot else '0,00'
-                    alicuota_ret_str = alicuota_ret_str.replace('.', ',')
-                    line += alicuota_ret_str[:5].zfill(5) if alicuot else '00,00'
-                    # 20 - Retencion practicada len(16)(2decimales)
-                    line += payment_amount_str[:16].zfill(16)
-                    # 21 - Monto Total recibido len(16)
-                    line += payment_amount_str[:16].zfill(16)
-                    # 22 - Aceptacion len(1)
-                    line += ' '
-                    # 23 - Fecha Aceptacion len(10)
-                    line += ' '.ljust(10)
-                    line += '\r\n'
-                    print(len(line))
-                    data.append(line)
+                            # 09 - Numero de Certificado Propio len(16)
+                            if number_retention:
+                                line += str(number_retention[:16].zfill(16))
+                            else:
+                                raise (_('The withholding number was not found in the {} payment within the {} payment group'.format(payment_line.name, payment.name)))
+                            # 10 - Tipo del documento len(1)
+                            identification_type = {
+                                'CUIT': '3',
+                                'CUIL': '2',
+                                'CDI': '1'
+                            }.get(payment.partner_id.l10n_latam_identification_type_id.name, ' ')
+                            line += identification_type
+                            # 11 - Numero de documento len(11)
+                            line += payment.partner_id.vat[:11].zfill(11)
+                            # 12 - Situacion IB len(1)
+                            income_type = {
+                                'local': '1',
+                                'multilateral': '2',
+                                'exempt': '4'
+                            }.get(payment.partner_id.l10n_ar_gross_income_type, '5')
+                            line += income_type
+                            # 13 - Nro Inscripcion IB len(11)
+                            if income_type in ['local', 'multilateral'] and not payment.partner_id.l10n_ar_gross_income_number:
+                                raise UserError(_('The partner {} does not have gross income configured in Contacts -> Fiscal data'.format(payment.partner_id.name)))
+                            if income_type not in ['local', 'multilateral']:
+                                income_type_number = ''.zfill(11)
+                            else:
+                                income_type_number = payment.partner_id.l10n_ar_gross_income_number[:11].zfill(11)
+                            line += income_type_number
+                            # 14 - Situacion Frente al IVA len(1)
+                            responsibility_type = {
+                                'IVA Responsable Inscripto': 1,
+                                'IVA Sujeto Exento': 3,
+                                'Responsable Monotributo': 4
+                            }.get(payment.partner_id.l10n_ar_afip_responsibility_type_id.name, 0)
+                            line += str(responsibility_type)
+                            # 15 - Razon Social len(30)
+                            partner_name = payment.partner_id.name[:30].ljust(30)
+                            line += partner_name
+                            # 16 - Importe otros conceptos len(16)(2decimales)
+                            line += '0,00'.zfill(16)
+                            # 17 - Importe IVA len(16)
+                            line += '0,00'.zfill(16)
+                            # 18 - Monto Sujeto a retencion len(16)(2decimales)
+                            amount_base_ret_str = '{:.2f}'.format(amount_base_ret).replace('.', ',')
+                            line += amount_base_ret_str[:16].zfill(16)
+                            # 19 - Alicuota len(5)(2decimales)
+                            alicuot = payment.partner_id.arba_alicuot_ids.filtered(lambda line: line.from_date == record.date_from and line.to_date == record.date_to and line.company_id.id == record.company_id.id)
+                            if len(alicuot) > 1:
+                                raise UserError(_('The partner: {} has more than one alicuot for the same period and company. Please keep only one alicuot for the same period {} and company {}').format(payment.partner_id.name, record.period, record.company_id.name))
+                            alicuota_ret_str = '{:.2f}'.format(alicuot.alicuota_retencion) if alicuot else '0,00'
+                            alicuota_ret_str = alicuota_ret_str.replace('.', ',')
+                            line += alicuota_ret_str[:5].zfill(5) if alicuot else '00,00'
+                            # 20 - Retencion practicada len(16)(2decimales)
+                            line += payment_amount_str[:16].zfill(16)
+                            # 21 - Monto Total recibido len(16)
+                            line += payment_amount_str[:16].zfill(16)
+                            # 22 - Aceptacion len(1)
+                            line += ' '
+                            # 23 - Fecha Aceptacion len(10)
+                            line += ' '.ljust(10)
+                            line += '\r\n'
+                            data.append(line)
+
                 #Percepciones
-                line = ''
                 invoices = self.get_perception_invoices(record.tag_tax.id, 'out_invoice')
                 for invoice in invoices:
+                    tag_tax = False
+                    for lines in invoice.invoice_line_ids:
+                        for tax in lines.tax_ids:
+
+                            tax_perc = tax.invoice_repartition_line_ids.filtered(lambda x: record.tag_tax.id in x.tag_ids.ids)
+                            if not tax_perc:
+                                continue
+                            else:
+                                if not tag_tax:
+                                    tag_tax = tax_perc
+                                else:
+                                    tag_tax += tax_perc
+                    if not tag_tax:
+                        continue
+                    line = ''
                     # 01 - Tipo de operacion len(1)
                     line += PERCEPTION
                     # 02 - Codigo de norma len(3)
@@ -361,9 +373,12 @@ class AccountExportArciba(models.Model):
                     }.get(invoice.partner_id.l10n_ar_gross_income_type, '5')
                     line += income_type
                     # 13 - Nro Inscripcion IB len(11)
-                    income_type_number = invoice.partner_id.l10n_ar_gross_income_number[:11].zfill(11)
-                    if income_type == 'exempt':
-                        income_type_number = '0'.zfill(11)
+                    if income_type in ['local', 'multilateral'] and not payment.partner_id.l10n_ar_gross_income_number:
+                        raise UserError(_('The partner {} does not have gross income configured in Contacts -> Fiscal data'))
+                    if income_type not in ['local', 'multilateral']:
+                        income_type_number = ''.zfill(11)
+                    else:
+                        income_type_number = payment.partner_id.l10n_ar_gross_income_number[:11].zfill(11)
                     line += income_type_number
                     # 14 - Situacion Frente al IVA len(1)
                     responsibility_type = {
@@ -416,77 +431,93 @@ class AccountExportArciba(models.Model):
                     line += '\r\n'
                     data.append(line)
             else:
-                line = ''
                 invoices = record.get_perception_invoices(record.tag_tax.id, 'out_refund')
                 for invoice in invoices:
-                        # 01 - Tipo de operacion len(1)
-                        line += PERCEPTION
-                        # 02 - Nro NotaCredito de norma len(12)
-                        doc_number = '0'
-                        doc_name = invoice.name.split(' ')
-                        doc_name = doc_name[1].split('-')
-                        if len(doc_name) > 0:
-                            doc_number = doc_name[1]
-                        line += str(doc_number)[:12].zfill(12)
-                        # 03 - Fecha de Retencion len(10)
-                        _date_invoice = invoice.invoice_date.strftime('%d/%m/%Y')
-                        line += str(_date_invoice)[:10]
-                        # 04 - Tipo de comprobante Origen len(2)
-                        amount = invoice.amount_untaxed
-                        amount_str = '{:.2f}'.format(amount)
-                        amount_str = str(amount_str).replace('.', ',')
-                        line += amount_str[:16].zfill(16)
-                        #05 - Nro Certificado Propio len(16)
-                        line += '0'[:16].zfill(16)
-                        #06 - Tipo de comprobante len(2)
-                        voucher_type = {
-                        'invoice': '01',
-                        }.get(invoice.l10n_latam_document_type_id.internal_type, '09')
-                        if voucher_type == 'invoice':
-                            if invoice.l10n_latam_document_type_id.doc_code_prefix == 'FCE-A':
-                                voucher_type = '10'
-                        line += voucher_type
-                        #07 - Letra del comprobante len(1)
-                        line += ' '
-                        #08 -Nro de comprobante
-                        doc_number_name = '0'
-                        doc_name_number = invoice.name.split(' ')
-                        if len(doc_name_number) > 0:
-                            try:
-                                doc_number_name = doc_name_number[1].replace('-','')
-                            except:
-                                record.failed_invoice_ids = [(4,invoice.id)]
+                    tag_tax = False
+                    for lines in invoice.invoice_line_ids:
+                        for tax in lines.tax_ids:
+
+                            tax_perc = tax.invoice_repartition_line_ids.filtered(lambda x: record.tag_tax.id in x.tag_ids.ids)
+                            if not tax_perc:
                                 continue
-                        line += str(doc_number_name)[:16].zfill(16)
-                        #09 - Nro de documento len(11)
-                        line += invoice.partner_id.vat[:11].zfill(11)
-                        #10 - Codigo de Norma len(3)
-                        line += STANDARD_CODE
-                        #11 - Fecha de retencion len(10)
-                        line += str(_date_invoice)[:10]
-                        #12 - Retencion/Percepcion a deducir len(16)(2decimales)
-                        amount_perceptions = 0
-                        for lines in invoice.invoice_line_ids:
-                            for tax in lines.tax_ids:
-                                tag_tax = tax.description.split()
-                                if tag_tax[0] == 'Perc' or tag_tax[0] == 'Ret':
-                                    for tax_line in tax.invoice_repartition_line_ids:
-                                        if record.tag_tax.id not in tax_line.tag_ids.ids:
-                                            amount_perceptions += record._get_tax_amount(tax, invoice.amount_untaxed)
-                        amount_perceptions_str = '{:.2f}'.format(amount_perceptions)
-                        amount_perceptions_str = str(amount_perceptions_str).replace('.', ',')
-                        line += amount_perceptions_str[:16].zfill(16)
-                        #13 - Alicuota len(5)(2decimales)
-                        alicuot = invoice.partner_id.arba_alicuot_ids.filtered(lambda line: line.from_date == record.date_from and line.to_date == record.date_to and line.company_id.id == record.company_id.id)
-                        if len(alicuot) > 1:
-                            raise UserError(_('The partner: {} has more than one alicuot for the same period and company. Please keep only one alicuot for the same period {} and company {}').format(invoice.partner_id.name, record.period, record.company_id.name))
-                        alicuota_ret_str = '{:.2f}'.format(alicuot.alicuota_retencion) if alicuot else '0,00'
-                        alicuota_ret_str = alicuota_ret_str.replace('.', ',')
-                        line += alicuota_ret_str[:5].zfill(5) if alicuot else '00,00'
-                        line += '\r\n'
-                        data.append(line)
+                            else:
+                                if not tag_tax:
+                                    tag_tax = tax_perc
+                                else:
+                                    tag_tax += tax_perc
+                    if not tag_tax:
+                        continue
+                    line = ''
+                    # 01 - Tipo de operacion len(1)
+                    line += PERCEPTION
+                    # 02 - Nro NotaCredito de norma len(12)
+                    doc_number = '0'
+                    doc_name = invoice.name.split(' ')
+                    doc_name = doc_name[1].split('-')
+                    if len(doc_name) > 0:
+                        doc_number = doc_name[1]
+                    line += str(doc_number)[:12].zfill(12)
+                    # 03 - Fecha de Retencion len(10)
+                    _date_invoice = invoice.invoice_date.strftime('%d/%m/%Y')
+                    line += str(_date_invoice)[:10]
+                    # 04 - Tipo de comprobante Origen len(2)
+                    amount = invoice.amount_untaxed
+                    amount_str = '{:.2f}'.format(amount)
+                    amount_str = str(amount_str).replace('.', ',')
+                    line += amount_str[:16].zfill(16)
+                    #05 - Nro Certificado Propio len(16)
+                    line += '0'[:16].zfill(16)
+                    #06 - Tipo de comprobante len(2)
+                    voucher_type = {
+                    'invoice': '01',
+                    }.get(invoice.l10n_latam_document_type_id.internal_type, '09')
+                    if voucher_type == 'invoice':
+                        if invoice.l10n_latam_document_type_id.doc_code_prefix == 'FCE-A':
+                            voucher_type = '10'
+                    line += voucher_type
+                    #07 - Letra del comprobante len(1)
+                    line += ' '
+                    #08 -Nro de comprobante
+                    doc_number_name = '0'
+                    doc_name_number = invoice.name.split(' ')
+                    if len(doc_name_number) > 0:
+                        try:
+                            doc_number_name = doc_name_number[1].replace('-','')
+                        except:
+                            record.failed_invoice_ids = [(4,invoice.id)]
+                            continue
+                    line += str(doc_number_name)[:16].zfill(16)
+                    #09 - Nro de documento len(11)
+                    line += invoice.partner_id.vat[:11].zfill(11)
+                    #10 - Codigo de Norma len(3)
+                    line += STANDARD_CODE
+                    #11 - Fecha de retencion len(10)
+                    line += str(_date_invoice)[:10]
+                    #12 - Retencion/Percepcion a deducir len(16)(2decimales)
+                    amount_perceptions = 0
+                    for lines in invoice.invoice_line_ids:
+                        for tax in lines.tax_ids:
+                            tag_tax = tax.description.split()
+                            if tag_tax[0] == 'Perc' or tag_tax[0] == 'Ret':
+                                for tax_line in tax.invoice_repartition_line_ids:
+                                    if record.tag_tax.id not in tax_line.tag_ids.ids:
+                                        amount_perceptions += record._get_tax_amount(tax, invoice.amount_untaxed)
+                    amount_perceptions_str = '{:.2f}'.format(amount_perceptions)
+                    amount_perceptions_str = str(amount_perceptions_str).replace('.', ',')
+                    line += amount_perceptions_str[:16].zfill(16)
+                    #13 - Alicuota len(5)(2decimales)
+                    alicuot = invoice.partner_id.arba_alicuot_ids.filtered(lambda line: line.from_date == record.date_from and line.to_date == record.date_to and line.company_id.id == record.company_id.id)
+                    if len(alicuot) > 1:
+                        raise UserError(_('The partner: {} has more than one alicuot for the same period and company. Please keep only one alicuot for the same period {} and company {}').format(invoice.partner_id.name, record.period, record.company_id.name))
+                    alicuota_ret_str = '{:.2f}'.format(alicuot.alicuota_retencion) if alicuot else '0,00'
+                    alicuota_ret_str = alicuota_ret_str.replace('.', ',')
+                    line += alicuota_ret_str[:5].zfill(5) if alicuot else '00,00'
+                    line += '\r\n'
+                    data.append(line)
             if data:
                 record.export_arciba_data = ''.join(data)
+            else:
+                record.export_arciba_data = False
 
     def _get_tax_amount(self, tax, amount_untaxed):
         amount_tax = 0
