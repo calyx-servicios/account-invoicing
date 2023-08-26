@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-02 20:47+0000\n"
-"PO-Revision-Date: 2023-08-02 20:47+0000\n"
+"POT-Creation-Date: 2023-08-25 15:18+0000\n"
+"PO-Revision-Date: 2023-08-25 15:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -92,6 +92,11 @@ msgid "ID"
 msgstr ""
 
 #. module: l10n_ar_export_arciba
+#: model:ir.model.fields,field_description:l10n_ar_export_arciba.field_account_export_arciba__failed_invoice_ids
+msgid "Invoice Failed"
+msgstr "Facturas ignoradas"
+
+#. module: l10n_ar_export_arciba
 #: model:ir.model.fields,field_description:l10n_ar_export_arciba.field_account_export_arciba__tag_tax
 msgid "Jurisdiction"
 msgstr "Jurisdicción"
@@ -122,6 +127,11 @@ msgid "Month of the period"
 msgstr "Mes del periodo"
 
 #. module: l10n_ar_export_arciba
+#: model:ir.model.fields,field_description:l10n_ar_export_arciba.field_account_export_arciba__failed_payment_ids
+msgid "Payment Failed"
+msgstr "Pagos Ignorados"
+
+#. module: l10n_ar_export_arciba
 #: model:ir.model.fields,field_description:l10n_ar_export_arciba.field_account_export_arciba__period
 msgid "Period"
 msgstr "Período"
@@ -139,13 +149,36 @@ msgstr "No se ha encontrado la jurisdicción para CABA"
 
 #. module: l10n_ar_export_arciba
 #: code:addons/l10n_ar_export_arciba/models/export_arciba.py:0
+#: code:addons/l10n_ar_export_arciba/models/export_arciba.py:0
 #, python-format
 msgid ""
 "The partner {} does not have gross income configured in Contacts -> Fiscal "
 "data"
 msgstr ""
-"El contacto {} no tiene ingresos brutos configurados en Contactos -> Datos"
-"Fiscales"
+"El contacto {} no tiene ingresos brutos configurados en Contactos -> "
+"Datos Fiscales"
+
+#. module: l10n_ar_export_arciba
+#: code:addons/l10n_ar_export_arciba/models/export_arciba.py:0
+#: code:addons/l10n_ar_export_arciba/models/export_arciba.py:0
+#: code:addons/l10n_ar_export_arciba/models/export_arciba.py:0
+#, python-format
+msgid ""
+"The partner: {} has more than one alicuot for the same period and company. "
+"Please keep only one alicuot for the same period {} and company {}"
+msgstr ""
+"El Contacto: {} tiene más de una alicuot para el mismo período y empresa."
+"Por favor conserve solo una alicuota para el mismo periodo {} y empresa {}"
+
+#. module: l10n_ar_export_arciba
+#: code:addons/l10n_ar_export_arciba/models/export_arciba.py:0
+#, python-format
+msgid ""
+"The withholding number was not found in the {} payment within the {} payment"
+" group"
+msgstr ""
+"No se encontró el número de retención en el pago {} dentro del grupo {}"
+" de pago"
 
 #. module: l10n_ar_export_arciba
 #: model:ir.model.fields,field_description:l10n_ar_export_arciba.field_account_export_arciba__date_to
@@ -176,4 +209,4 @@ msgstr "Año del periodo"
 #: code:addons/l10n_ar_export_arciba/models/export_arciba.py:0
 #, python-format
 msgid "You have not configured the CUIT for this company"
-msgstr "No tienes configurado el CUIT para esta empresa"
+msgstr "No has configurado la CUIT para esta empresa"
