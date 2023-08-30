@@ -194,7 +194,6 @@ class AccountExportArciba(models.Model):
                         for tax_line in pay_line.tax_withholding_id.invoice_repartition_line_ids:
                             if not self.tag_tax.id in tax_line.tag_ids.ids:
                                 continue
-                            amount_ret = pay_line.computed_withholding_amount
                             amount_base_ret = pay_line.withholding_base_amount
                             number_retention = pay_line.withholding_number
                             payment_amount = pay_line.amount
@@ -233,14 +232,14 @@ class AccountExportArciba(models.Model):
                             line += str(_date)[:10]
                             # 08 - Monto del comprobante len(16)(2decimales)
                             payment_amount_str = '{:.2f}'.format(payment_amount).replace('.', ',')
-                            amount_ret_str = '{:.2f}'.format(amount_ret).replace('.', ',')
-                            line += amount_ret_str[:16].zfill(16)
+                            amount_base_ret_str = '{:.2f}'.format(amount_base_ret).replace('.', ',')
+                            line += amount_base_ret_str[:16].zfill(16)
 
                             # 09 - Numero de Certificado Propio len(16)
                             if number_retention:
                                 line += str(number_retention[:16].zfill(16))
                             else:
-                                raise (_('The withholding number was not found in the {} payment within the {} payment group'.format(payment_line.name, payment.name)))
+                                raise (_('The withholding number was not found in the {} payment within the {} payment group'.format(pay_line.name, payment.name)))
                             # 10 - Tipo del documento len(1)
                             identification_type = {
                                 'CUIT': '3',
@@ -280,7 +279,6 @@ class AccountExportArciba(models.Model):
                             # 17 - Importe IVA len(16)
                             line += '0,00'.zfill(16)
                             # 18 - Monto Sujeto a retencion len(16)(2decimales)
-                            amount_base_ret_str = '{:.2f}'.format(amount_base_ret).replace('.', ',')
                             line += amount_base_ret_str[:16].zfill(16)
                             # 19 - Alicuota len(5)(2decimales)
                             alicuot = payment.partner_id.arba_alicuot_ids.filtered(lambda line: line.from_date == record.date_from and line.to_date == record.date_to and line.company_id.id == record.company_id.id)
