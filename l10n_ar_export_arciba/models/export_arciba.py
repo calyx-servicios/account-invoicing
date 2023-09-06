@@ -506,10 +506,7 @@ class AccountExportArciba(models.Model):
                     alicuota_ret_str = alicuota_ret_str.replace(".", ",")
                     line += alicuota_ret_str[:5].zfill(5) if alicuot else "00,00"
                     # 20 - Retencion practicada len(16)(2decimales)
-                    _logger.info("Esta es una información percepciones.")
-                    _logger.info(invoice.line_ids)
                     for linea in invoice.line_ids:
-                        _logger.info(line)
                         if linea.name == "Percepción IIBB CABA Aplicada":
                             monto_alicuota_per = "{:.2f}".format(linea.credit)
                             monto_alicuota_per = str(monto_alicuota_per).replace(
