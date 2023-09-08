@@ -280,14 +280,14 @@ class AccountExportArciba(models.Model):
                                         )
                                     )
                                 )
-                            if income_type not in ["local", "multilateral"]:
-                                income_type_number = "".zfill(11)
-                            else:
+                            if payment.partner_id.l10n_ar_gross_income_number:
                                 income_type_number = (
                                     payment.partner_id.l10n_ar_gross_income_number[
                                         :11
                                     ].zfill(11)
                                 )
+                            else:
+                                income_type_number = "0".zfill(11)
                             line += income_type_number
                             # 14 - Situacion Frente al IVA len(1)
                             responsibility_type = {
@@ -399,7 +399,7 @@ class AccountExportArciba(models.Model):
                     # 07 - Fecha del comprobante len(10)
                     line += str(_date_invoice)[:10]
                     # 08 - Monto del comprobante len(16)(2decimales)
-                    amount = invoice.amount_untaxed
+                    amount = invoice.amount_total
                     amount_str = "{:.2f}".format(amount)
                     amount_str = str(amount_str).replace(".", ",")
                     line += amount_str[:16].zfill(16)
@@ -423,21 +423,21 @@ class AccountExportArciba(models.Model):
                     # 13 - Nro Inscripcion IB len(11)
                     if (
                         income_type in ["local", "multilateral"]
-                        and not payment.partner_id.l10n_ar_gross_income_number
+                        and not invoice.partner_id.l10n_ar_gross_income_number
                     ):
                         raise UserError(
                             _(
                                 "The partner {} does not have gross income configured in Contacts -> Fiscal data"
                             )
                         )
-                    if income_type not in ["local", "multilateral"]:
-                        income_type_number = "".zfill(11)
-                    else:
+                    if invoice.partner_id.l10n_ar_gross_income_number:
                         income_type_number = (
-                            payment.partner_id.l10n_ar_gross_income_number[:11].zfill(
+                            invoice.partner_id.l10n_ar_gross_income_number[:11].zfill(
                                 11
                             )
                         )
+                    else:
+                        income_type_number = "0".zfill(11)
                     line += income_type_number
                     # 14 - Situacion Frente al IVA len(1)
                     responsibility_type = {
@@ -632,6 +632,8 @@ class AccountExportArciba(models.Model):
                     line += "\r\n"
                     data.append(line)
             if data:
+                # Ordena la lista 'data' basada en la fecha
+                data.sort(key=lambda x: x[4:14])
                 record.export_arciba_data = "".join(data)
             else:
                 record.export_arciba_data = False
