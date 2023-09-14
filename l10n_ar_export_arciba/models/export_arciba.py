@@ -384,7 +384,7 @@ class AccountExportArciba(models.Model):
                             voucher_type = "10"
                     line += voucher_type
                     # 05 - Letra del comprobante len(1)
-                    line += " "
+                    line += "A"
                     # 06 - Nro del comprobante len(16)
                     doc_number = "0"
                     doc_name = invoice.name.split(" ")
@@ -399,7 +399,12 @@ class AccountExportArciba(models.Model):
                     # 07 - Fecha del comprobante len(10)
                     line += str(_date_invoice)[:10]
                     # 08 - Monto del comprobante len(16)(2decimales)
-                    amount = invoice.amount_total
+                    # este for lo tenia en el #20 pero necesito antes el dato
+                    for linea in invoice.line_ids:
+                        if linea.name == "Percepción IIBB CABA Aplicada":
+                            monto_alicuota_per = "{:.2f}".format(linea.credit)
+                            monto_alicuota_per_float = float(monto_alicuota_per)
+                    amount = invoice.amount_total - monto_alicuota_per_float
                     amount_str = "{:.2f}".format(amount)
                     amount_str = str(amount_str).replace(".", ",")
                     line += amount_str[:16].zfill(16)
@@ -506,12 +511,13 @@ class AccountExportArciba(models.Model):
                     alicuota_ret_str = alicuota_ret_str.replace(".", ",")
                     line += alicuota_ret_str[:5].zfill(5) if alicuot else "00,00"
                     # 20 - Retencion practicada len(16)(2decimales)
-                    for linea in invoice.line_ids:
-                        if linea.name == "Percepción IIBB CABA Aplicada":
-                            monto_alicuota_per = "{:.2f}".format(linea.credit)
-                            monto_alicuota_per = str(monto_alicuota_per).replace(
-                                ".", ","
-                            )
+                    # for linea in invoice.line_ids:
+                    #     if linea.name == "Percepción IIBB CABA Aplicada":
+                    #         monto_alicuota_per = "{:.2f}".format(linea.credit)
+                    #         monto_alicuota_per = str(monto_alicuota_per).replace(
+                    #             ".", ","
+                    #         )
+                    monto_alicuota_per = str(monto_alicuota_per).replace(".", ",")
                     line += monto_alicuota_per[:16].zfill(16)
                     # 21 - Monto Total recibido len(16)
                     line += monto_alicuota_per[:16].zfill(16)
