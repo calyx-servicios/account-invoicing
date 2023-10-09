@@ -360,53 +360,42 @@ class AccountExportSircar(models.Model):
                         data.append(line)
                         nro_line += 1
                        
-            elif tag_tax.jurisdiction_code == '906':
-                # Percepciones Chaco
+            else:
+                # Percepciones
                 invoices = self.get_perception_invoices(impSIRCAR, jurSIRCAR)
                 data = []
                 if tag_tax.jurisdiction_code != '904':
                     # Diseño N°1
                     nro_line = 1
                     for invoice in invoices:
-                        
                         # Campo 01 -- Número de renglón len 5
-                        cuit = self.env.company.vat.replace('-','')
-                        line += str(cuit) 
+                        line = str(nro_line).zfill(5) + ","
                         
-                        # Campo 02 -- Origen del comprobante len 1
-                        origen = invoice.name[2]
-                        line += str(origen) 
-
-                        # Campo 03 -- comprobante
-                        comprobante=invoice.name.replace('-', '')
-                        line += str(comprobante) 
+                        # Campo 02 -- Tipo de comprobante len 3
+                        # Campo 03 -- Letra del comprobante len 1
+                        # Campo 04 -- Numero del comprobante len 12  
+                        code_prefix = '001'
+                        code_letter = 'Z'
+                        code_issue = '0'
+                        doc_name = invoice.name.split(' ')
+                        if len(doc_name) > 0:
+                            doc_type = doc_name[0].split('-')
+                            code_prefix = DOCUMENT_TYPES.get(doc_type[0],'001')
+                            code_letter = doc_type[1]
+                            #code_issue = doc_name[1].replace('-','')[-12:]
+                                                    
+                        line += str(code_prefix) + ","
+                        line += str(code_letter) + ","
+                        line += str(code_issue).zfill(12) + ","
                         
-                        # Campo 04 -- cuit del contribuyente
-                        cuit_partner = invoice.partner_id.vat.zfill(11)
-                        line += str(cuit_partner + ("     "))
-
-                        # Campo 05 -- Nombre cliente
-                        name_partner = invoice.partner_id.commercial_company_name
-                        line += str(name_partner + ("     "))
-
+                        # Campo 05 -- Cuit contribuyente involucrado en la transacción comercial len 11
+                        line += invoice.partner_id.vat.zfill(11) + ","
+                        
                         # Campo 06 -- Fecha percepcion len 10
-                        _date = invoice.invoice_date.strftime('%d %m %Y')
-                        line += str(_date)
+                        _date = invoice.invoice_date.strftime('%d/%m/%Y')
+                        line += _date + ","
                         
-                       # Campo 07 -- Monto percibido len 12
-                        amount_total = (invoice.amount_tax)
-                        line += '{:011}'.format(int(amount_total * 100))
-                        
-                       
-                        # Campo 8 -- Tipo de régimen de percepcion len 2
-                        type_reg_perc = '0'
-                        for line_alicuot in invoice.partner_id.arba_alicuot_ids:
-                            if line_alicuot.tag_id.id == jurSIRCAR and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date:
-                                type_reg_perc = line_alicuot.regimen_percepcion
-                        
-                        line += type_reg_perc.zfill(2)
-                        
-                        # Campo 010 -- Monto sujeto a percepción len 9
+                        # Campo 07 -- Monto sujeto a percepción len 12
                         if invoice.currency_id.id != invoice.company_id.currency_id.id:
                             amount = self.convert_currency(
                                 invoice.amount_untaxed,
@@ -415,18 +404,38 @@ class AccountExportSircar(models.Model):
                             )
                         else:
                             amount = invoice.amount_untaxed
-                        amount_str = int(amount * 100)
-                        line += f'{amount_str:09}'.replace('.','')
+                        amount_str = '{:.2f}'.format(amount)
+                        #amount_str = amount_str.replace('.', ',')
+                        line += str(amount_str).zfill(12) + ","
                         
-
-                        #Campo 011 -- Alicuota len 4
+                        # Campo 08 -- Alicuota len 6
                         amount_alicout = 0
                         for line_alicuot in invoice.partner_id.arba_alicuot_ids:
                             if line_alicuot.tag_id.id == jurSIRCAR and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date: 
                                 amount_alicout = line_alicuot.alicuota_percepcion
-                                
-                        amount_alicout_str = int(amount_alicout * 100)
-                        line += f'{amount_alicout}'.replace('.','').zfill(4)
+                        
+                        amount_alicout_str = '{:.2f}'.format(amount_alicout)
+                        #amount_alicout_str = amount_alicout_str.replace('.', ',')
+                        line += str(amount_alicout_str).zfill(6) + ","
+                        
+                        # Campo 09 -- Monto percibido len 12
+                        currency = invoice.company_id.currency_id
+                        amount_total = (amount * amount_alicout) / 100
+                        amount_total_round = currency.round(amount_total)
+                        amount_total = '{:.2f}'.format(amount_total_round)
+                        #amount_total = amount_total.replace('.', ',')
+                        line += str(amount_total).zfill(12) + ","
+
+                        # Campo 10 -- Tipo de régimen de percepcion len 3
+                        type_reg_perc = '0'
+                        for line_alicuot in invoice.partner_id.arba_alicuot_ids:
+                            if line_alicuot.tag_id.id == jurSIRCAR and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date:
+                                type_reg_perc = line_alicuot.regimen_percepcion
+                        
+                        line += type_reg_perc.zfill(3) + ","
+                        
+                        # Campo 11 -- Jurisdicción len 3
+                        line += tag_tax.jurisdiction_code
                         
                         data.append(line)
                         nro_line += 1
@@ -511,64 +520,7 @@ class AccountExportSircar(models.Model):
                         
                         data.append(line)
                         nro_line += 1
-            
-                data.append('')
-                rec.export_sircar_data = '\n'.join(data)
-            
-            else:
-                # Percepciones Misiones
-                invoices = self.get_perception_invoices(impSIRCAR, jurSIRCAR)
-                data = []
-                if tag_tax.jurisdiction_code != '904':
-                    # Diseño N°1
-                    nro_line = 1
-                    for invoice in invoices:
-                        # Campo 01 -- Fecha percepcion len 10
-                        _date = invoice.invoice_date.strftime('%d-%m-%Y')
-                        line += _date + ","
+                
+            data.append('')
+            rec.export_sircar_data = '\n'.join(data)
 
-                        # Campo 02 -- Tipo de comprobante
-                        voucher = {
-                            '1' : 'FA_A',
-                            '2' : 'FA_B',
-                            '3' : 'RBO_A',
-                            '4' : 'RBO_B',
-                            '5' : 'NC_A',
-                            '6' : 'NC_B',
-                            '7' : 'ND_A',
-                            '8' : 'ND_B'
-                            }
-                        if invoice.name[2] in voucher:
-                            line += voucher[invoice.name[2]] + ","
-                        
-                        # Campo 03 -- Numero de comprobante
-
-                        number = invoice.name[-8:]
-                        line += number + ","
-
-                        # Campo 04 -- Nombre o Razon Social
-
-                        name_partner = invoice.partner_id.commercial_company_name
-                        line += name_partner + ","
-
-                        # Campo 05 -- cuit del contribuyente
-                        cuit_partner = invoice.partner_id.vat.zfill(11)
-                        line += cuit_partner + ","
-
-                        # Campo 06 -- Monto Total
-                        amount_total = formatted_amount = "{:.2f}".format(invoice.amount_residual)
-                        line += amount_total + ","
-
-                        #Campo 07 -- Alicuota len 4
-                        amount_alicout = 0
-                        for line_alicuot in invoice.partner_id.arba_alicuot_ids:
-                            if line_alicuot.tag_id.id == jurSIRCAR and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date: 
-                                amount_alicout = line_alicuot.alicuota_percepcion
-                                
-                        line += str(amount_alicout) + ",,,,"
-
-                        data.append(line)
-                        nro_line += 1
-            
-                data.append('')
-                rec.export_sircar_data = '\n'.join(data)
