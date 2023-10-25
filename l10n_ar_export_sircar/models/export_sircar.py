@@ -390,9 +390,15 @@ class AccountExportSircar(models.Model):
                         line += str(name_partner + ("     "))
 
                         # Campo 06 -- Fecha percepcion len 10
-                        _date = invoice.invoice_date.strftime('%d %m %Y')
-                        line += str(_date)
-                        
+                        _date = invoice.invoice_date
+                        day = str(_date.day) + ' ' if _date.day < 10 else str(_date.day)
+                        month = str(_date.month) + ' ' if _date.month < 10 else str(_date.month)
+                        year = str(_date.year)
+                        formatted_date = f'{day}{month}{year}'
+                        line += formatted_date
+
+
+
                        # Campo 07 -- Monto percibido len 12
                         amount_total = (invoice.amount_tax)
                         line += '{:011}'.format(int(amount_total * 100))
@@ -425,9 +431,10 @@ class AccountExportSircar(models.Model):
                             if line_alicuot.tag_id.id == jurSIRCAR and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date: 
                                 amount_alicout = line_alicuot.alicuota_percepcion
                                 
-                        amount_alicout_str = int(amount_alicout * 100)
-                        line += f'{amount_alicout}'.replace('.','').zfill(4)
-                        
+                        amount_alicout_int = int(amount_alicout * 100)
+                        amount_alicout_str = str(amount_alicout_int).zfill(4)
+                        line += amount_alicout_str
+                                                
                         data.append(line)
                         nro_line += 1
                 else:
