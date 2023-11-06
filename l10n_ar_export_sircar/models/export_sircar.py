@@ -374,8 +374,7 @@ class AccountExportSircar(models.Model):
                         line += str(cuit) 
                         
                         # Campo 02 -- Origen del comprobante len 1
-                        origen = invoice.name[2]
-                        line += str(origen) 
+                        line += invoice.name[3]
 
                         # Campo 03 -- comprobante
                         comprobante=invoice.name.replace('-', '')
@@ -400,18 +399,22 @@ class AccountExportSircar(models.Model):
 
 
                        # Campo 07 -- Monto percibido len 12
-                        amount_total = (invoice.amount_tax)
-                        line += '{:011}'.format(int(amount_total * 100))
+                      amount_total = invoice.amount_by_group[1][1]
+                      line += '{:011}'.format(int(amount_total * 100))
                         
                        
                         # Campo 8 -- Tipo de régimen de percepcion len 2
-                        type_reg_perc = '0'
+                        code_table = 0
                         for line_alicuot in invoice.partner_id.arba_alicuot_ids:
-                            if line_alicuot.tag_id.id == jurSIRCAR and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date:
-                                type_reg_perc = line_alicuot.regimen_percepcion
+                            amount_alicout = line_alicuot.alicuota_percepcion
+                            if amount_alicout == 3.5:
+                                code_table = 1
+                            elif amount_alicout == 2:
+                                code_table = 2
                         
-                        line += type_reg_perc.zfill(2)
-                        
+                        line += str(code_table)
+
+                                              
                         # Campo 010 -- Monto sujeto a percepción len 9
                         if invoice.currency_id.id != invoice.company_id.currency_id.id:
                             amount = self.convert_currency(
@@ -545,12 +548,13 @@ class AccountExportSircar(models.Model):
                             '7' : 'ND_A',
                             '8' : 'ND_B'
                             }
-                        if invoice.name[2] in voucher:
-                            line += voucher[invoice.name[2]] + ","
-                        
+
+                        if invoice.name[3] in voucher:
+                            line += voucher[invoice.name[3]] + ","
+ 
                         # Campo 03 -- Numero de comprobante
 
-                        number = invoice.name[-8:]
+                        number = invoice.name
                         line += number + ","
 
                         # Campo 04 -- Nombre o Razon Social
@@ -560,7 +564,8 @@ class AccountExportSircar(models.Model):
 
                         # Campo 05 -- cuit del contribuyente
                         cuit_partner = invoice.partner_id.vat.zfill(11)
-                        line += cuit_partner + ","
+                        formatted_cuit = f"{cuit_partner[:2]}-{cuit_partner[2:10]}-{cuit_partner[10]}"
+                        line += formatted_cuit + ","
 
                         # Campo 06 -- Monto Total
                         amount_total = formatted_amount = "{:.2f}".format(invoice.amount_residual)
