@@ -22,3 +22,4 @@
         'views/account_view.xml',
     ],
 }
+

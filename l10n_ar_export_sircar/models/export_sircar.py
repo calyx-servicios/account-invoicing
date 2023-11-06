@@ -399,8 +399,8 @@ class AccountExportSircar(models.Model):
 
 
                        # Campo 07 -- Monto percibido len 12
-                        amount_total = invoice.amount_by_group[1][1]
-                        line += '{:011}'.format(int(amount_total * 100))
+                      amount_total = invoice.amount_by_group[1][1]
+                      line += '{:011}'.format(int(amount_total * 100))
                         
                        
                         # Campo 8 -- Tipo de régimen de percepcion len 2
@@ -413,7 +413,8 @@ class AccountExportSircar(models.Model):
                                 code_table = 2
                         
                         line += str(code_table)
-                        
+
+                                              
                         # Campo 010 -- Monto sujeto a percepción len 9
                         if invoice.currency_id.id != invoice.company_id.currency_id.id:
                             amount = self.convert_currency(
@@ -547,9 +548,10 @@ class AccountExportSircar(models.Model):
                             '7' : 'ND_A',
                             '8' : 'ND_B'
                             }
+
                         if invoice.name[3] in voucher:
                             line += voucher[invoice.name[3]] + ","
-                        
+ 
                         # Campo 03 -- Numero de comprobante
 
                         number = invoice.name
