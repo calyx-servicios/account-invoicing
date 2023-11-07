@@ -368,16 +368,30 @@ class AccountExportSircar(models.Model):
                     # Diseño N°1
                     nro_line = 1
                     for invoice in invoices:
-                        
+                        line = ""
                         # Campo 01 -- Número de renglón len 5
                         cuit = self.env.company.vat.replace('-','')
                         line += str(cuit) 
                         
                         # Campo 02 -- Origen del comprobante len 1
-                        line += invoice.name[3]
+                        voucher = {
+                            '1' : 'FA-A',
+                            '2' : 'FA-B',
+                            '3' : 'RBO-A',
+                            '4' : 'RBO-B',
+                            '5' : 'NC-A',
+                            '6' : 'NC-B',
+                            '7' : 'ND-A',
+                            '8' : 'ND-B'
+                            }
+                        prefix = invoice.name.split()[0]
+                        code = [key for key, value in voucher.items() if value == prefix]
+                        if code:
+                            code = code[0]
+                        line += str(code)  
 
                         # Campo 03 -- comprobante
-                        comprobante=invoice.name.replace('-', '')
+                        comprobante= invoice.name[-14:].replace("-", "")
                         line += str(comprobante) 
                         
                         # Campo 04 -- cuit del contribuyente
@@ -533,28 +547,18 @@ class AccountExportSircar(models.Model):
                     # Diseño N°1
                     nro_line = 1
                     for invoice in invoices:
+                        line = ""
                         # Campo 01 -- Fecha percepcion len 10
                         _date = invoice.invoice_date.strftime('%d-%m-%Y')
                         line += _date + ","
 
                         # Campo 02 -- Tipo de comprobante
-                        voucher = {
-                            '1' : 'FA_A',
-                            '2' : 'FA_B',
-                            '3' : 'RBO_A',
-                            '4' : 'RBO_B',
-                            '5' : 'NC_A',
-                            '6' : 'NC_B',
-                            '7' : 'ND_A',
-                            '8' : 'ND_B'
-                            }
-
-                        if invoice.name[3] in voucher:
-                            line += voucher[invoice.name[3]] + ","
+                        prefix = invoice.name.split()[0].replace('-', '_')
+                        line += prefix + ","
  
                         # Campo 03 -- Numero de comprobante
 
-                        number = invoice.name
+                        number = invoice.name[-5:]
                         line += number + ","
 
                         # Campo 04 -- Nombre o Razon Social
