@@ -4,6 +4,7 @@ from odoo.tools import date_utils
 from odoo.exceptions import UserError
 from datetime import date, timedelta, datetime
 import base64, calendar
+import json
 
 WITHHOLDING = '1'
 PERCEPTION = '2'
@@ -391,16 +392,16 @@ class AccountExportSircar(models.Model):
                         line += str(code)  
 
                         # Campo 03 -- comprobante
-                        comprobante= invoice.name[-14:].replace("-", "")
+                        comprobante = "0" + invoice.name[-14:].replace("-", "")
                         line += str(comprobante) 
                         
                         # Campo 04 -- cuit del contribuyente
                         cuit_partner = invoice.partner_id.vat.zfill(11)
-                        line += str(cuit_partner + ("     "))
+                        line += str(cuit_partner + ("         "))
 
                         # Campo 05 -- Nombre cliente
-                        name_partner = invoice.partner_id.commercial_company_name
-                        line += str(name_partner + ("     "))
+                        name_partner = invoice.partner_id.commercial_company_name[:30].ljust(30)
+                        line += str(name_partner).upper()
 
                         # Campo 06 -- Fecha percepcion len 10
                         _date = invoice.invoice_date
@@ -414,7 +415,7 @@ class AccountExportSircar(models.Model):
 
                        # Campo 07 -- Monto percibido len 12
                         amount_total = invoice.amount_by_group[1][1]
-                        line += '{:011}'.format(int(amount_total * 100))
+                        line += '{:012}'.format(int(amount_total * 100))
                         
                        
                         # Campo 8 -- Tipo de régimen de percepcion len 2
@@ -439,7 +440,7 @@ class AccountExportSircar(models.Model):
                         else:
                             amount = invoice.amount_untaxed
                         amount_str = int(amount * 100)
-                        line += f'{amount_str:09}'.replace('.','')
+                        line += f'{amount_str:011}'.replace('.','')
                         
 
                         #Campo 011 -- Alicuota len 4
@@ -563,7 +564,7 @@ class AccountExportSircar(models.Model):
 
                         # Campo 04 -- Nombre o Razon Social
 
-                        name_partner = invoice.partner_id.commercial_company_name
+                        name_partner = invoice.partner_id.commercial_company_name.upper()
                         line += name_partner + ","
 
                         # Campo 05 -- cuit del contribuyente
@@ -580,8 +581,32 @@ class AccountExportSircar(models.Model):
                         for line_alicuot in invoice.partner_id.arba_alicuot_ids:
                             if line_alicuot.tag_id.id == jurSIRCAR and rec.date_from >= line_alicuot.from_date and rec.date_to <= line_alicuot.to_date: 
                                 amount_alicout = line_alicuot.alicuota_percepcion
-                                
-                        line += str(amount_alicout) + ",,,,"
+                        line += str(amount_alicout)
+
+                        if prefix == 'NC_A':
+                            # Campo 08 -- Tipo de comprobante original
+                            info = json.loads(invoice.invoice_payments_widget)
+                            campo_8 = info['content'][0]['name'].split()[0]
+                            line += "," + campo_8 + ","
+
+                            # Campo 09 -- Numero de comprobante original
+                            campo_9 = info['content'][0]['name'][-6:]
+                            line += campo_9 + ","
+
+                            # Campo 10 -- Fecha de comprobante original
+                            origin_date_str = info['content'][0]['date']
+                            origin_date = datetime.strptime(origin_date_str, '%Y-%m-%d')  
+                            campo_10 = origin_date.strftime('%d-%m-%Y')
+                            line += str(campo_10) + ","
+
+
+                            # Campo 11 -- CUIT de comprobante original
+                            cuit_partner = invoice.partner_id.vat.zfill(11)
+                            campo_11 = f"{cuit_partner[:2]}-{cuit_partner[2:10]}-{cuit_partner[10]}"
+                            line += campo_11 
+                        
+                        else:
+                            line +=  ",,,,"
 
                         data.append(line)
                         nro_line += 1
