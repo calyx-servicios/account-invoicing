@@ -551,30 +551,30 @@ class AccountExportSircar(models.Model):
                         line = ""
                         # Campo 01 -- Fecha percepcion len 10
                         _date = invoice.invoice_date.strftime('%d-%m-%Y')
-                        line += _date + ","
+                        line += str(_date) + ","
 
                         # Campo 02 -- Tipo de comprobante
                         prefix = invoice.name.split()[0].replace('-', '_')
-                        line += prefix + ","
+                        line += str(prefix) + ","
  
                         # Campo 03 -- Numero de comprobante
 
                         number = invoice.name[-5:]
-                        line += number + ","
+                        line += str(number) + ","
 
                         # Campo 04 -- Nombre o Razon Social
 
                         name_partner = invoice.partner_id.commercial_company_name.upper()
-                        line += name_partner + ","
+                        line += str(name_partner) + ","
 
                         # Campo 05 -- cuit del contribuyente
                         cuit_partner = invoice.partner_id.vat.zfill(11)
                         formatted_cuit = f"{cuit_partner[:2]}-{cuit_partner[2:10]}-{cuit_partner[10]}"
-                        line += formatted_cuit + ","
+                        line += str(formatted_cuit) + ","
 
                         # Campo 06 -- Monto Total
                         amount_total = formatted_amount = "{:.2f}".format(invoice.amount_residual)
-                        line += amount_total + ","
+                        line += str(amount_total) + ","
 
                         #Campo 07 -- Alicuota len 4
                         amount_alicout = 0
@@ -586,12 +586,12 @@ class AccountExportSircar(models.Model):
                         if prefix == 'NC_A':
                             # Campo 08 -- Tipo de comprobante original
                             info = json.loads(invoice.invoice_payments_widget)
-                            campo_8 = info['content'][0]['name'].split()[0]
-                            line += "," + campo_8 + ","
+                            campo_8 = info['content'][0]['name'].split()[0].replace('-', '_')
+                            line += "," + str(campo_8) + ","
 
                             # Campo 09 -- Numero de comprobante original
                             campo_9 = info['content'][0]['name'][-6:]
-                            line += campo_9 + ","
+                            line += str(campo_9) + ","
 
                             # Campo 10 -- Fecha de comprobante original
                             origin_date_str = info['content'][0]['date']
@@ -603,7 +603,7 @@ class AccountExportSircar(models.Model):
                             # Campo 11 -- CUIT de comprobante original
                             cuit_partner = invoice.partner_id.vat.zfill(11)
                             campo_11 = f"{cuit_partner[:2]}-{cuit_partner[2:10]}-{cuit_partner[10]}"
-                            line += campo_11 
+                            line += str(campo_11) 
                         
                         else:
                             line +=  ",,,,"
