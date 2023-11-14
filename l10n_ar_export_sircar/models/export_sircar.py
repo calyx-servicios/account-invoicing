@@ -567,6 +567,7 @@ class AccountExportSircar(models.Model):
                         name_partner = invoice.partner_id.commercial_company_name.upper()
                         line += str(name_partner) + ","
 
+                       
                         # Campo 05 -- cuit del contribuyente
                         cuit_partner = invoice.partner_id.vat.zfill(11)
                         formatted_cuit = f"{cuit_partner[:2]}-{cuit_partner[2:10]}-{cuit_partner[10]}"
@@ -593,6 +594,7 @@ class AccountExportSircar(models.Model):
                             campo_9 = info['content'][0]['name'][-6:]
                             line += str(campo_9) + ","
 
+                            
                             # Campo 10 -- Fecha de comprobante original
                             origin_date_str = info['content'][0]['date']
                             origin_date = datetime.strptime(origin_date_str, '%Y-%m-%d')  
@@ -603,7 +605,9 @@ class AccountExportSircar(models.Model):
                             # Campo 11 -- CUIT de comprobante original
                             cuit_partner = invoice.partner_id.vat.zfill(11)
                             campo_11 = f"{cuit_partner[:2]}-{cuit_partner[2:10]}-{cuit_partner[10]}"
+
                             line += str(campo_11) 
+
                         
                         else:
                             line +=  ",,,,"
