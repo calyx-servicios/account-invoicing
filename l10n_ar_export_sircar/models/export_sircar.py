@@ -400,7 +400,7 @@ class AccountExportSircar(models.Model):
                         line += str(cuit_partner + ("         "))
 
                         # Campo 05 -- Nombre cliente
-                        name_partner = invoice.partner_id.commercial_company_name[:30].ljust(30)
+                        name_partner = invoice.partner_id.commercial_partner_id.display_name[:30].ljust(30)
                         line += str(name_partner).upper()
 
                         # Campo 06 -- Fecha percepcion len 10
@@ -414,12 +414,12 @@ class AccountExportSircar(models.Model):
 
 
                        # Campo 07 -- Monto percibido len 12
-                        amount_total = invoice.amount_by_group[1][1]
+                        amount_total = invoice.amount_by_group[0][1]
                         line += '{:011}'.format(int(amount_total * 100))
                         
                        
                         # Campo 8 -- Tipo de régimen de percepcion len 2
-                        code_table = 0
+                        code_table = "0 "
                         for line_alicuot in invoice.partner_id.arba_alicuot_ids:
                             amount_alicout = line_alicuot.alicuota_percepcion
                             if amount_alicout == 3.5:
