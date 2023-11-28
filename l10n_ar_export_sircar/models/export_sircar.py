@@ -559,7 +559,7 @@ class AccountExportSircar(models.Model):
  
                         # Campo 03 -- Numero de comprobante
 
-                        number = invoice.name[-5:]
+                        number = invoice.name[-6:]
                         line += str(number) + ","
 
                         # Campo 04 -- Nombre o Razon Social
@@ -586,19 +586,17 @@ class AccountExportSircar(models.Model):
 
                         if prefix == 'NC_A':
                             # Campo 08 -- Tipo de comprobante original
-                            info = json.loads(invoice.invoice_payments_widget)
-                            campo_8 = info['content'][0]['name'].split()[0].replace('-', '_')
+                            campo_8 = invoice.ref[14:18].replace('-', '_')
                             line += "," + str(campo_8) + ","
 
                             # Campo 09 -- Numero de comprobante original
-                            campo_9 = info['content'][0]['name'][-6:]
+                            campo_9 = invoice.ref[-6:]
                             line += str(campo_9) + ","
 
                             
                             # Campo 10 -- Fecha de comprobante original
-                            origin_date_str = info['content'][0]['date']
-                            origin_date = datetime.strptime(origin_date_str, '%Y-%m-%d')  
-                            campo_10 = origin_date.strftime('%d-%m-%Y')
+                            origin_date_str = invoice.reversed_entry_id.date
+                            campo_10 = origin_date_str.strftime('%d-%m-%Y') 
                             line += str(campo_10) + ","
 
 
