@@ -574,8 +574,8 @@ class AccountExportSircar(models.Model):
                         line += str(formatted_cuit) + ","
 
                         # Campo 06 -- Monto Total
-                        amount_total = formatted_amount = "{:.2f}".format(invoice.amount_residual)
-                        line += str(amount_total) + ","
+                        amount_untaxed = invoice.amount_untaxed
+                        line += "{:.2f},".format(amount_untaxed)
 
                         #Campo 07 -- Alicuota len 4
                         amount_alicout = 0
@@ -590,7 +590,8 @@ class AccountExportSircar(models.Model):
                             line += "," + str(campo_8) + ","
 
                             # Campo 09 -- Numero de comprobante original
-                            campo_9 = invoice.ref[-6:]
+                            number_fc = json.loads(invoice.invoice_payments_widget)
+                            campo_9 = number_fc["content"][0]["name"][-6:]
                             line += str(campo_9) + ","
 
                             
