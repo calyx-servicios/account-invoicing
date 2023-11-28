@@ -60,6 +60,8 @@ Contributors
   
   * Perez Gabriela
 
+  * Leandro Ferrari
+
 Maintainers
 ~~~~~~~~~~~
 
