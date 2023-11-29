@@ -414,8 +414,12 @@ class AccountExportSircar(models.Model):
 
 
                        # Campo 07 -- Monto percibido len 12
-                        amount_total = invoice.amount_by_group[0][1]
-                        line += '{:011}'.format(int(amount_total * 100))
+                        amount_total = invoice.amount_by_group
+                        for item in amount_total:
+                            if 'Perc IIBB Chaco' in item:
+                                indice = item.index('Perc IIBB Chaco')
+                                amount_perception = item[indice + 1]
+                        line += '{:011}'.format(int(amount_perception * 100))
                         
                        
                         # Campo 8 -- Tipo de régimen de percepcion len 2
