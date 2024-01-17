@@ -69,8 +69,8 @@ class AccountTax(models.Model):
 
                 for tax in vat_taxes:
                     withholding_amount = (
-                        move.move_id.amount_tax
-                        * 1.0
+                        move.move_id.amount_untaxed
+                        * 0.21
                     )
 
                     if withholding_amount:
