@@ -284,7 +284,13 @@ class AccountExportSicore(models.Model):
                     line += str(payment.partner_id.vat)[:20].zfill(20)
 
                     # Campo 17 -- Número certificado original len 14
-                    line += payment.document_number.split('-')[1].zfill(14)
+                    if '-' in payment.document_number:
+                        # Dividir la cadena y obtener la segunda parte, luego rellenar con ceros
+                        number_document = payment.document_number.split('-')[1].zfill(14)
+                    else:
+                        # Si no hay guión, simplemente rellena con ceros
+                        number_document = payment.document_number.zfill(14)
+                    line += number_document
                     
                     
                     data.append(line)
