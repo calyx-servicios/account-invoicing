@@ -5,11 +5,11 @@
         This module generates the Arciba file for withholdings, perceptions and credit notes.
     """,
     "author": "Calyx Servicios S.A.",
-    "maintainers": ["Zamora, Javier"],
+    "maintainers": ["Zamora, Javier", "leandro090685"],
     "website": "http://odoo.calyx-cloud.com.ar/",
     "license": "AGPL-3",
     "category": "Account",
-    "version": "16.0.1.0.0",
+    "version": "16.0.2.0.0",
     "installable": True,
     "application": False,
     "depends": [

@@ -80,7 +80,7 @@ class AccountExportArciba(models.Model):
 
     def _get_default_tag_tax(self):
         jusdiriction = self.env.ref('l10n_ar_ux.tag_tax_jurisdiccion_901')
-        if jusdiriction:
+        if not jusdiriction:
             raise ValidationError(_('The jurisdiction for CABA has not been found'))
         return jusdiriction            
 
