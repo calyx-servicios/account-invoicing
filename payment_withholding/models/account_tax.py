@@ -92,10 +92,10 @@ class AccountTax(models.Model):
                 move = payment_group.to_pay_move_line_ids[0].move_id
                 journal = self.env['account.journal'].search([
                     ('company_id', '=', move.company_id.id),
-                    ('outbound_payment_method_line_ids.payment_method_id.code', '=', 'withholding'),
                     ('type', 'in', ['cash', 'bank']),
-                ], limit=1)
-
+                ]).filtered(
+                    lambda x: 'withholding' in x.outbound_payment_method_line_ids.payment_method_id.mapped('code')
+                )[0]
                 if not journal:
                     raise UserError(
                         _('No journal for withholdings found on company %s')
