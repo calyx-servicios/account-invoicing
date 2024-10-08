@@ -64,7 +64,7 @@ class AccountExportSicore(models.Model):
         readonly=True,
     )
     
-    company_id = fields.Many2one('res.company')
+    company_id = fields.Many2one('res.company', default=lambda self: self.env.company)
     
     final_line_break = fields.Boolean('Final line break?', default=False)
 
@@ -289,16 +289,16 @@ class AccountExportSicore(models.Model):
                     line += '0'.zfill(14)
                     
                     # Campo 18 -- Denominación del ordenante len 30
-                    line += "0".zfill(30)
+                    #line += "0".zfill(30)
                     
                     # Campo 19 -- Acrecentamiento len 1
-                    line += "0"
+                    #line += "0"
                     
                     # Campo 20 -- Cuit del país retenido len 11
-                    line += "0".zfill(11)
+                    #line += "0".zfill(11)
                     
                     # Campo 21 -- Cuit del ordenante len 11
-                    line += str(payment.company_id.vat).replace('-','')[:11].zfill(11)
+                    #line += str(payment.company_id.vat).replace('-','')[:11].zfill(11)
                     
                     data.append(line)
             else:
@@ -382,16 +382,16 @@ class AccountExportSicore(models.Model):
                     line += '0'.zfill(14)
                     
                     # Campo 18 -- Denominación del ordenante len 30
-                    line += "0".zfill(30)
+                    #line += "0".zfill(30)
                     
                     # Campo 19 -- Acrecentamiento len 1
-                    line += "0"
+                    #line += "0"
                     
                     # Campo 20 -- Cuit del país retenido len 11
-                    line += "0".zfill(11)
+                    #line += "0".zfill(11)
                     
                     # Campo 21 -- Cuit del ordenante len 11
-                    line += str(invoice.company_id.vat).replace('-','')[:11].zfill(11)
+                    #line += str(invoice.company_id.vat).replace('-','')[:11].zfill(11)
                     
                     data.append(line)
             
