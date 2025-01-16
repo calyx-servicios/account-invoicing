@@ -2,7 +2,7 @@
 {
     "name": "Export Sicore",
     "summary": """
-        This module generates the sicore file for 
+        This module generates the sicore file for
         withholdings and perceptions.
     """,
     "author": "Calyx Servicios S.A.",
@@ -10,7 +10,7 @@
     "website": "http://odoo.calyx-cloud.com.ar/",
     "license": "AGPL-3",
     "category": "Account",
-    "version": "16.0.2.1.0",
+    "version": "17.0.1.0.0",
     "installable": True,
     "application": False,
     "depends": [

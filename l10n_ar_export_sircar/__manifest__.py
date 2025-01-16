@@ -2,7 +2,7 @@
 {
     "name": "Export SIRCAR",
     "summary": """
-        This module generates the SIRCAR file for 
+        This module generates the SIRCAR file for
         withholdings and perceptions.
     """,
     "author": "Calyx Servicios S.A.",
@@ -10,7 +10,7 @@
     "website": "http://odoo.calyx-cloud.com.ar/",
     "license": "AGPL-3",
     "category": "Account",
-    "version": "16.0.1.0.0",
+    "version": "17.0.1.0.0",
     'installable': True,
     'application': False,
     "depends": [
