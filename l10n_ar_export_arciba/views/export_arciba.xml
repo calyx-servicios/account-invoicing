@@ -42,13 +42,13 @@
 	    <field name="name">account.export.arciba.tree</field>
 	    <field name="model">account.export.arciba</field>
 	    <field name="arch" type="xml">
-	        <tree>
+	        <list>
 	            <field name="export_arciba_filename"/>
 	            <field name="company_id"/>
 	            <field name="date_from"/>
 	            <field name="date_to"/>
 	            <field name="period"/>
-	        </tree>
+	        </list>
 	    </field>
 	</record>
 

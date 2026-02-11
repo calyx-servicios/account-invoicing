@@ -40,7 +40,7 @@
 		<field name="name">account.export.sicore.tree</field>
 		<field name="model">account.export.sicore</field>
 		<field name="arch" type="xml">
-			<tree>
+			<list>
 				<field name="export_sicore_filename"/>
 				<field name="company_id"/>
 				<field name="date_from"/>
@@ -49,7 +49,7 @@
 				<field name="period"/>
 				<field name="fortnight"/>
 				<field name="final_line_break"/>
-			</tree>
+			</list>
 		</field>
 	</record>
 	

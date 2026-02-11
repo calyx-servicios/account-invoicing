@@ -10,11 +10,12 @@
     "website": "http://odoo.calyx-cloud.com.ar/",
     "license": "AGPL-3",
     "category": "Account",
-    "version": "16.0.1.1.0",
-    "installable": True,
+    "version": "18.0.1.1.0",
+    "installable": False,  # TODO: needs refactoring for Odoo 18
     "application": False,
     "depends": [
-        "l10n_ar_account_withholding"
+        "l10n_ar_withholding",
+        "l10n_ar_tax",
     ],
     "data": [
         "data/account_journal.xml",

@@ -8,12 +8,13 @@
     "website": "https://odoo.calyx-cloud.com.ar/",
     "license": "AGPL-3",
     "category": "Purchase",
-    "version": "16.0.2.1.0",
+    "version": "18.0.2.1.0",
     "development_status": "Production/Stable",
     "application": False,
-    "installable": True,
+    "installable": False,  # TODO: needs refactoring for Odoo 18
     "depends": [
-        'account_withholding_automatic',
+        'l10n_ar_withholding',
+        'l10n_ar_tax',
         'account_payment_group',
     ],
     "data": [

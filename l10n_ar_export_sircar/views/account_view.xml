@@ -40,7 +40,7 @@
 	    <field name="name">account.export.sircar.tree</field>
 	    <field name="model">account.export.sircar</field>
 	    <field name="arch" type="xml">
-	        <tree>
+	        <list>
 	            <field name="export_sircar_filename"/>
 	            <field name="company_id"/>
 	            <field name="date_from"/>
@@ -48,7 +48,7 @@
 	            <field name="doc_type"/>
 	            <field name="tag_tax"/>
 	            <field name="period"/>
-	        </tree>
+	        </list>
 	    </field>
 	</record>
 	
